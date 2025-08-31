@@ -1,0 +1,12 @@
+# Ignore uploaded images but keep the folder
+*.jpg
+*.jpeg
+*.png
+*.gif
+*.webp
+*.svg
+*.bmp
+*.tiff
+
+# Keep this file
+!.gitkeep

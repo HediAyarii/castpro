@@ -1,0 +1,14 @@
+<svg width="200" height="100" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <style>
+      .cast-text { font-family: Arial, sans-serif; font-size: 48px; font-weight: bold; fill: #ff0000; }
+      .background { fill: #ffffff; }
+    </style>
+  </defs>
+  
+  <!-- Background -->
+  <rect width="200" height="100" class="background"/>
+  
+  <!-- CAST text -->
+  <text x="100" y="60" text-anchor="middle" class="cast-text">CAST</text>
+</svg>
