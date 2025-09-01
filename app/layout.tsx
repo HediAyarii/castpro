@@ -4,6 +4,7 @@ import { Space_Grotesk, DM_Sans } from "next/font/google"
 import "./globals.css"
 import { Toaster } from "@/components/ui/sonner"
 import { generateStructuredData } from "./structured-data"
+import { ClientLayoutWrapper } from "@/components/client-layout-wrapper"
 
 const spaceGrotesk = Space_Grotesk({
   subsets: ["latin"],
@@ -86,7 +87,9 @@ export default function RootLayout({
         />
       </head>
       <body className="font-sans antialiased">
-        {children}
+        <ClientLayoutWrapper>
+          {children}
+        </ClientLayoutWrapper>
         <Toaster />
       </body>
     </html>

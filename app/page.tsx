@@ -874,9 +874,9 @@ export default function Home() {
                         img.src = '/placeholder-logo.png'
                       }}
                     />
-                </div>
+                  </div>
                 ))}
-                </div>
+            </div>
           ) : (
             <div className="text-center text-gray-300">Aucun logo partenaire pour le moment.</div>
           )}
@@ -890,7 +890,7 @@ export default function Home() {
             <p className="text-xl text-gray-300">Ils nous font confiance</p>
           </div>
           {clientLogos.length > 0 ? (
-          <div className="relative overflow-hidden">
+            <div className="relative overflow-hidden">
               <div className="flex items-center" style={{ width: clientLogos.length >= 6 ? "calc(200% + 48px)" : "auto" }}>
                 {(clientLogos.length >= 6 ? [0, 1] : [0]).map((repeat) => (
                   <div key={repeat} className={`flex items-center space-x-12 min-w-max ${clientLogos.length >= 6 ? 'animate-scroll' : ''}`}>
@@ -899,7 +899,7 @@ export default function Home() {
                         <img
                           src={(logo.logo_url || '').trim() || '/placeholder-logo.png'}
                           alt={logo.alt_text || logo.name || 'Logo partenaire'}
-                  className="h-12 w-auto opacity-70 hover:opacity-100 transition-opacity flex-shrink-0"
+                          className="h-12 w-auto opacity-70 hover:opacity-100 transition-opacity flex-shrink-0"
                           onError={(e) => {
                             const img = e.target as HTMLImageElement
                             img.src = '/placeholder-logo.png'
@@ -907,7 +907,7 @@ export default function Home() {
                         />
                       </a>
                     ))}
-              </div>
+                  </div>
                 ))}
               </div>
             </div>

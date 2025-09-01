@@ -8,6 +8,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Badge } from "@/components/ui/badge"
 import { ImageUpload } from "@/components/ui/image-upload"
 import { BulkUpload } from "@/components/ui/bulk-upload"
+import { BulkLogoUpload } from "@/components/ui/bulk-logo-upload"
 import { safeLocalStorage } from "@/lib/storage"
 import {
   Calendar,
@@ -119,6 +120,7 @@ export default function AdminLogin() {
   const [editingPortfolio, setEditingPortfolio] = useState<PortfolioItem | null>(null)
   const [newPortfolioItem, setNewPortfolioItem] = useState<Partial<PortfolioItem>>({})
   const [isBulkUploadOpen, setIsBulkUploadOpen] = useState(false)
+  const [isBulkLogoUploadOpen, setIsBulkLogoUploadOpen] = useState(false)
 
   // Castings state
   const [castings, setCastings] = useState<Casting[]>([])
@@ -278,6 +280,24 @@ export default function AdminLogin() {
       await loadPortfolios()
     } catch (error) {
       console.error('Erreur lors de l\'upload en masse:', error)
+    }
+  }
+
+  const handleBulkLogoUpload = async (uploadedLogos: Array<{ name: string; logo_url: string; alt_text: string; website_url: string; category: 'partner' | 'client' }>) => {
+    try {
+      // Sauvegarder chaque logo via l'API
+      for (const logo of uploadedLogos) {
+        await fetch('/api/partner-logos', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(logo)
+        })
+      }
+
+      // Recharger les logos depuis l'API
+      await loadPartnerLogos()
+    } catch (error) {
+      console.error('Erreur lors de l\'upload en masse des logos:', error)
     }
   }
 
@@ -1070,6 +1090,7 @@ export default function AdminLogin() {
               onBulkUpload={handleBulkUpload}
               activeTab={activePortfolioTab}
             />
+
           </div>
         )}
 
@@ -1622,10 +1643,16 @@ export default function AdminLogin() {
           <div className="space-y-6">
             <div className="flex justify-between items-center">
               <h2 className="text-2xl font-bold">Gestion des Logos</h2>
-              <Button onClick={() => setNewPartnerLogo({})}>
-                <Plus className="h-4 w-4 mr-2" />
-                Ajouter un logo
-              </Button>
+              <div className="flex gap-2">
+                <Button onClick={() => setIsBulkLogoUploadOpen(true)}>
+                  <Upload className="h-4 w-4 mr-2" />
+                  Upload en masse
+                </Button>
+                <Button onClick={() => setNewPartnerLogo({})}>
+                  <Plus className="h-4 w-4 mr-2" />
+                  Ajouter un logo
+                </Button>
+              </div>
             </div>
 
             {newPartnerLogo && (
@@ -1697,6 +1724,13 @@ export default function AdminLogin() {
                 </Card>
               ))}
             </div>
+
+            {/* Bulk Logo Upload Modal */}
+            <BulkLogoUpload
+              isOpen={isBulkLogoUploadOpen}
+              onClose={() => setIsBulkLogoUploadOpen(false)}
+              onBulkUpload={handleBulkLogoUpload}
+            />
           </div>
         )}
 
