@@ -424,7 +424,6 @@ export default function Home() {
                 À Propos
               </a>
             </div>
-            <Button className="bg-primary hover:bg-primary/90">Rejoindre</Button>
           </div>
         </div>
       </nav>
@@ -538,9 +537,9 @@ export default function Home() {
             </div>
             <div className="relative bg-black p-4 rounded-lg">
               <img
-                src="/images/wall.jpg"
+                src="/images/studio.jpg"
                 alt="Charte de hauteur CastPro"
-                className="rounded-lg shadow-xl border border-gray-700 w-full h-auto"
+                className="rounded-lg shadow-xl border border-gray-700 w-full aspect-video object-cover"
               />
               <div className="absolute -bottom-6 -right-6 bg-primary text-primary-foreground p-6 rounded-lg shadow-lg border border-primary/30">
                 <div className="text-lg font-bold">Notre Mission</div>
