@@ -71,7 +71,7 @@ export function NetflixOpeningAnimation({ onComplete }: NetflixOpeningAnimationP
         {/* Logo with glow effect */}
         <div className="relative">
           <img
-            src="/images/castpro.png"
+                            src="/images/castpro.png"
             alt="CastPro"
             className="h-32 w-auto filter drop-shadow-2xl"
             style={{

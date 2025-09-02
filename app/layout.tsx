@@ -38,9 +38,13 @@ export const metadata: Metadata = {
     canonical: '/',
   },
   icons: {
-    icon: '/images/castpro.png',
-    shortcut: '/images/castpro.png',
-    apple: '/images/castpro.png',
+    icon: [
+      { url: '/favicon.svg', type: 'image/svg+xml' },
+      { url: '/favicon-16x16.svg', sizes: '16x16', type: 'image/svg+xml' },
+      { url: '/favicon-48x48.svg', sizes: '48x48', type: 'image/svg+xml' }
+    ],
+    shortcut: '/favicon.svg',
+    apple: '/favicon.svg',
   },
   openGraph: {
     type: 'website',
@@ -79,6 +83,9 @@ export default function RootLayout({
   return (
     <html lang="fr" className={`${spaceGrotesk.variable} ${dmSans.variable}`}>
       <head>
+        <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+        <link rel="icon" type="image/svg+xml" sizes="16x16" href="/favicon-16x16.svg" />
+        <link rel="icon" type="image/svg+xml" sizes="48x48" href="/favicon-48x48.svg" />
         <script
           type="application/ld+json"
           dangerouslySetInnerHTML={{

@@ -85,15 +85,6 @@ interface AccessKey {
   isActive: boolean
 }
 
-interface MediaItem {
-  id: string
-  name: string
-  type: "video" | "logo"
-  url: string
-  description: string
-  createdAt: string
-}
-
 interface PartnerLogo {
   id?: number
   name: string
@@ -134,8 +125,6 @@ export default function AdminLogin() {
 
   const [accessKeys, setAccessKeys] = useState<AccessKey[]>([])
   const [newAccessKey, setNewAccessKey] = useState<Partial<AccessKey>>({})
-  const [mediaItems, setMediaItems] = useState<MediaItem[]>([])
-  const [newMediaItem, setNewMediaItem] = useState<Partial<MediaItem>>({})
   const [partnerLogos, setPartnerLogos] = useState<PartnerLogo[]>([])
   const [newPartnerLogo, setNewPartnerLogo] = useState<Partial<PartnerLogo>>({})
   const [showKeyValues, setShowKeyValues] = useState<{ [key: string]: boolean }>({})
@@ -173,7 +162,6 @@ export default function AdminLogin() {
     loadCastings()
     loadTestimonials()
     loadAccessKeys()
-    loadMediaItems()
     loadPartnerLogos()
   }
 
@@ -565,13 +553,6 @@ export default function AdminLogin() {
     navigator.clipboard.writeText(text)
   }
 
-  const loadMediaItems = () => {
-    const stored = safeLocalStorage.getItem("mediaItems")
-    if (stored) {
-      setMediaItems(JSON.parse(stored))
-    }
-  }
-
   const loadPartnerLogos = async () => {
     try {
       const res = await fetch('/api/partner-logos')
@@ -608,29 +589,6 @@ export default function AdminLogin() {
     } catch (e) {
       console.error('Erreur lors de la suppression du logo partenaire:', e)
     }
-  }
-
-  const saveMediaItem = (mediaItem: MediaItem) => {
-    const updated = mediaItem.id
-      ? mediaItems.map((m) => (m.id === mediaItem.id ? mediaItem : m))
-      : [
-          ...mediaItems,
-          {
-            ...mediaItem,
-            id: Date.now().toString(),
-            createdAt: new Date().toISOString(),
-          },
-        ]
-
-    setMediaItems(updated)
-    safeLocalStorage.setItem("mediaItems", JSON.stringify(updated))
-    setNewMediaItem({})
-  }
-
-  const deleteMediaItem = (id: string) => {
-    const updated = mediaItems.filter((m) => m.id !== id)
-    setMediaItems(updated)
-    safeLocalStorage.setItem("mediaItems", JSON.stringify(updated))
   }
 
   if (!isLoggedIn) {
@@ -716,13 +674,7 @@ export default function AdminLogin() {
               <Key className="h-5 w-5 inline mr-2" />
               Clés d'accès
             </button>
-            <button
-              onClick={() => setActiveTab("media")}
-              className={`px-6 py-3 font-medium whitespace-nowrap ${activeTab === "media" ? "border-b-2 border-blue-500 text-blue-600" : "text-gray-500 hover:text-gray-700"}`}
-            >
-              <ImageIcon className="h-5 w-5 inline mr-2" />
-              Médias
-            </button>
+
             <button
               onClick={() => setActiveTab("partner-logos")}
               className={`px-6 py-3 font-medium whitespace-nowrap ${activeTab === "partner-logos" ? "border-b-2 border-blue-500 text-blue-600" : "text-gray-500 hover:text-gray-700"}`}
@@ -1538,99 +1490,6 @@ export default function AdminLogin() {
                           <Trash2 className="h-4 w-4" />
                         </Button>
                       </div>
-                    </div>
-                  </CardContent>
-                </Card>
-              ))}
-            </div>
-          </div>
-        )}
-
-        {activeTab === "media" && (
-          <div className="space-y-6">
-            <div className="flex justify-between items-center">
-              <h2 className="text-2xl font-bold">Gestion des Médias</h2>
-              <Button onClick={() => setNewMediaItem({ type: "video" })}>
-                <Plus className="h-4 w-4 mr-2" />
-                Ajouter un média
-              </Button>
-            </div>
-
-            {/* Add Media Form */}
-            {Object.keys(newMediaItem).length > 0 && (
-              <Card>
-                <CardHeader>
-                  <CardTitle>Ajouter un nouveau média</CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <div className="grid md:grid-cols-2 gap-4">
-                    <Input
-                      placeholder="Nom du média"
-                      value={newMediaItem.name || ""}
-                      onChange={(e) => setNewMediaItem({ ...newMediaItem, name: e.target.value })}
-                    />
-                    <select
-                      value={newMediaItem.type || "video"}
-                      onChange={(e) => setNewMediaItem({ ...newMediaItem, type: e.target.value as "video" | "logo" })}
-                      className="px-3 py-2 border border-gray-300 rounded-md"
-                    >
-                      <option value="video">Vidéo de collaboration</option>
-                      <option value="logo">Logo partenaire</option>
-                    </select>
-                    <Input
-                      placeholder="URL du média"
-                      value={newMediaItem.url || ""}
-                      onChange={(e) => setNewMediaItem({ ...newMediaItem, url: e.target.value })}
-                      className="md:col-span-2"
-                    />
-                  </div>
-                  <Textarea
-                    placeholder="Description"
-                    className="mt-4"
-                    value={newMediaItem.description || ""}
-                    onChange={(e) => setNewMediaItem({ ...newMediaItem, description: e.target.value })}
-                  />
-                  <div className="flex gap-2 mt-4">
-                    <Button onClick={() => saveMediaItem(newMediaItem as MediaItem)}>
-                      <Save className="h-4 w-4 mr-2" />
-                      Sauvegarder
-                    </Button>
-                    <Button variant="outline" onClick={() => setNewMediaItem({})}>
-                      Annuler
-                    </Button>
-                  </div>
-                </CardContent>
-              </Card>
-            )}
-
-            {/* Media Grid */}
-            <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
-              {mediaItems.map((media) => (
-                <Card key={media.id}>
-                  <CardContent className="p-4">
-                    <div className="aspect-video bg-gray-100 rounded-lg mb-4 flex items-center justify-center">
-                      {media.type === "video" ? (
-                        <video src={media.url} className="w-full h-full object-cover rounded-lg" controls />
-                      ) : (
-                        <img
-                          src={media.url || "/placeholder.svg"}
-                          alt={media.name}
-                          className="w-full h-full object-contain rounded-lg"
-                        />
-                      )}
-                    </div>
-                    <div className="flex items-center gap-2 mb-2">
-                      <h3 className="font-semibold">{media.name}</h3>
-                      <Badge variant="outline">{media.type === "video" ? "Vidéo" : "Logo"}</Badge>
-                    </div>
-                    <p className="text-gray-600 text-sm mb-4">{media.description}</p>
-                    <div className="flex justify-between items-center">
-                      <span className="text-xs text-gray-500">
-                        {new Date(media.createdAt).toLocaleDateString("fr-FR")}
-                      </span>
-                      <Button size="sm" variant="destructive" onClick={() => deleteMediaItem(media.id)}>
-                        <Trash2 className="h-4 w-4" />
-                      </Button>
                     </div>
                   </CardContent>
                 </Card>

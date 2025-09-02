@@ -4,7 +4,7 @@ import { useState, useEffect } from "react"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
-import { ArrowLeft, Filter, Search, X } from "lucide-react"
+import { ArrowLeft, Filter, Search, X, Menu } from "lucide-react"
 import Link from "next/link"
 
 export default function PortfolioPage() {
@@ -14,6 +14,7 @@ export default function PortfolioPage() {
   const [selectedImage, setSelectedImage] = useState<{ src: string; name: string; age: string } | null>(null)
   const [talents, setTalents] = useState<any[]>([])
   const [loading, setLoading] = useState(true)
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false)
 
   // Fetch talents from database (portfolio principal uniquement)
   useEffect(() => {
@@ -152,6 +153,8 @@ export default function PortfolioPage() {
                 />
               </Link>
             </div>
+            
+            {/* Desktop Menu */}
             <div className="hidden md:flex items-center space-x-8">
               <Link href="/#services" className="text-foreground hover:text-primary transition-colors">
                 Services
@@ -166,8 +169,59 @@ export default function PortfolioPage() {
                 Contact
               </Link>
             </div>
-            <Button className="bg-primary hover:bg-primary/90">Rejoindre</Button>
+
+            {/* Mobile Menu Button */}
+            <div className="md:hidden">
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
+                className="p-2"
+              >
+                {isMobileMenuOpen ? (
+                  <X className="h-6 w-6" />
+                ) : (
+                  <Menu className="h-6 w-6" />
+                )}
+              </Button>
+            </div>
           </div>
+
+          {/* Mobile Menu */}
+          {isMobileMenuOpen && (
+            <div className="md:hidden border-t border-border bg-background/95 backdrop-blur-md">
+              <div className="px-2 pt-2 pb-3 space-y-1">
+                <Link
+                  href="/#services"
+                  className="block px-3 py-2 text-foreground hover:text-primary transition-colors"
+                  onClick={() => setIsMobileMenuOpen(false)}
+                >
+                  Services
+                </Link>
+                <Link
+                  href="/#casting"
+                  className="block px-3 py-2 text-foreground hover:text-primary transition-colors"
+                  onClick={() => setIsMobileMenuOpen(false)}
+                >
+                  Casting
+                </Link>
+                <Link
+                  href="/#talents"
+                  className="block px-3 py-2 text-foreground hover:text-primary transition-colors"
+                  onClick={() => setIsMobileMenuOpen(false)}
+                >
+                  Talents
+                </Link>
+                <Link
+                  href="/#contact"
+                  className="block px-3 py-2 text-foreground hover:text-primary transition-colors"
+                  onClick={() => setIsMobileMenuOpen(false)}
+                >
+                  Contact
+                </Link>
+              </div>
+            </div>
+          )}
         </div>
       </nav>
 

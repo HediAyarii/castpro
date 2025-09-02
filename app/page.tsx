@@ -25,6 +25,8 @@ import {
   Unlock,
   Eye,
   EyeOff,
+  Menu,
+  X,
 } from "lucide-react"
 import Link from "next/link"
 
@@ -62,6 +64,7 @@ export default function Home() {
   const router = useRouter()
   const [mousePosition, setMousePosition] = useState({ x: 0, y: 0 })
   const [currentSlide, setCurrentSlide] = useState(0)
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false)
   const [counters] = useState({
     talents: 5000,
     productions: 150,
@@ -403,6 +406,8 @@ export default function Home() {
                 className="h-10 w-auto"
               />
             </div>
+            
+            {/* Desktop Menu */}
             <div className="hidden md:flex items-center space-x-8">
               <a href="#services" className="text-foreground hover:text-primary transition-colors">
                 Services
@@ -410,7 +415,6 @@ export default function Home() {
               <a href="#casting" className="text-foreground hover:text-primary transition-colors">
                 Casting
               </a>
-              
               <a href="#talents" className="text-foreground hover:text-primary transition-colors">
                 Talents
               </a>
@@ -424,7 +428,73 @@ export default function Home() {
                 À Propos
               </a>
             </div>
+
+            {/* Mobile Menu Button */}
+            <div className="md:hidden">
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
+                className="p-2"
+              >
+                {isMobileMenuOpen ? (
+                  <X className="h-6 w-6" />
+                ) : (
+                  <Menu className="h-6 w-6" />
+                )}
+              </Button>
+            </div>
           </div>
+
+          {/* Mobile Menu */}
+          {isMobileMenuOpen && (
+            <div className="md:hidden border-t border-border bg-background/95 backdrop-blur-md">
+              <div className="px-2 pt-2 pb-3 space-y-1">
+                <a
+                  href="#services"
+                  className="block px-3 py-2 text-foreground hover:text-primary transition-colors"
+                  onClick={() => setIsMobileMenuOpen(false)}
+                >
+                  Services
+                </a>
+                <a
+                  href="#casting"
+                  className="block px-3 py-2 text-foreground hover:text-primary transition-colors"
+                  onClick={() => setIsMobileMenuOpen(false)}
+                >
+                  Casting
+                </a>
+                <a
+                  href="#talents"
+                  className="block px-3 py-2 text-foreground hover:text-primary transition-colors"
+                  onClick={() => setIsMobileMenuOpen(false)}
+                >
+                  Talents
+                </a>
+                <a
+                  href="#portfolio"
+                  className="block px-3 py-2 text-foreground hover:text-primary transition-colors"
+                  onClick={() => setIsMobileMenuOpen(false)}
+                >
+                  Portfolio
+                </a>
+                <a
+                  href="#contact"
+                  className="block px-3 py-2 text-foreground hover:text-primary transition-colors"
+                  onClick={() => setIsMobileMenuOpen(false)}
+                >
+                  Contact
+                </a>
+                <a
+                  href="#about"
+                  className="block px-3 py-2 text-foreground hover:text-primary transition-colors"
+                  onClick={() => setIsMobileMenuOpen(false)}
+                >
+                  À Propos
+                </a>
+              </div>
+            </div>
+          )}
         </div>
       </nav>
 
