@@ -32,6 +32,7 @@ import Link from "next/link"
 
 import LocationMap from "@/components/location-map"
 import { VideoCollaboration } from "@/components/video-collaboration"
+import { FlipCard } from "@/components/ui/flip-card"
 import { safeLocalStorage } from "@/lib/storage"
 
 
@@ -408,25 +409,39 @@ export default function Home() {
             </div>
             
             {/* Desktop Menu */}
-            <div className="hidden md:flex items-center space-x-8">
+            <div className="hidden md:flex items-center space-x-6">
+              <a href="#about" className="text-foreground hover:text-primary transition-colors">
+                Mieux nous connaître
+              </a>
               <a href="#services" className="text-foreground hover:text-primary transition-colors">
                 Services
-              </a>
-              <a href="#casting" className="text-foreground hover:text-primary transition-colors">
-                Casting
               </a>
               <a href="#talents" className="text-foreground hover:text-primary transition-colors">
                 Talents
               </a>
-              <a href="#portfolio" className="text-foreground hover:text-primary transition-colors">
+              <Link href="/portfolio" className="text-foreground hover:text-primary transition-colors">
                 Portfolio
+              </Link>
+              <a href="#collaborations" className="text-foreground hover:text-primary transition-colors">
+                Collaborations
+              </a>
+              <a href="#castings" className="text-foreground hover:text-primary transition-colors">
+                Castings
+              </a>
+              <a href="#testimonials" className="text-foreground hover:text-primary transition-colors">
+                Témoignages
               </a>
               <a href="#contact" className="text-foreground hover:text-primary transition-colors">
-                Contact
+                Contactez
               </a>
-              <a href="#about" className="text-foreground hover:text-primary transition-colors">
-                À Propos
-              </a>
+              <Button 
+                variant="outline" 
+                size="sm"
+                onClick={() => setIsAppointmentModalOpen(true)}
+                className="border-primary text-primary hover:bg-primary hover:text-white"
+              >
+                Prendre un rdv
+              </Button>
             </div>
 
             {/* Mobile Menu Button */}
@@ -451,18 +466,18 @@ export default function Home() {
             <div className="md:hidden border-t border-border bg-background/95 backdrop-blur-md">
               <div className="px-2 pt-2 pb-3 space-y-1">
                 <a
+                  href="#about"
+                  className="block px-3 py-2 text-foreground hover:text-primary transition-colors"
+                  onClick={() => setIsMobileMenuOpen(false)}
+                >
+                  Mieux nous connaître
+                </a>
+                <a
                   href="#services"
                   className="block px-3 py-2 text-foreground hover:text-primary transition-colors"
                   onClick={() => setIsMobileMenuOpen(false)}
                 >
                   Services
-                </a>
-                <a
-                  href="#casting"
-                  className="block px-3 py-2 text-foreground hover:text-primary transition-colors"
-                  onClick={() => setIsMobileMenuOpen(false)}
-                >
-                  Casting
                 </a>
                 <a
                   href="#talents"
@@ -471,27 +486,50 @@ export default function Home() {
                 >
                   Talents
                 </a>
-                <a
-                  href="#portfolio"
+                <Link
+                  href="/portfolio"
                   className="block px-3 py-2 text-foreground hover:text-primary transition-colors"
                   onClick={() => setIsMobileMenuOpen(false)}
                 >
                   Portfolio
+                </Link>
+                <a
+                  href="#collaborations"
+                  className="block px-3 py-2 text-foreground hover:text-primary transition-colors"
+                  onClick={() => setIsMobileMenuOpen(false)}
+                >
+                  Collaborations
+                </a>
+                <a
+                  href="#castings"
+                  className="block px-3 py-2 text-foreground hover:text-primary transition-colors"
+                  onClick={() => setIsMobileMenuOpen(false)}
+                >
+                  Castings
+                </a>
+                <a
+                  href="#testimonials"
+                  className="block px-3 py-2 text-foreground hover:text-primary transition-colors"
+                  onClick={() => setIsMobileMenuOpen(false)}
+                >
+                  Témoignages
                 </a>
                 <a
                   href="#contact"
                   className="block px-3 py-2 text-foreground hover:text-primary transition-colors"
                   onClick={() => setIsMobileMenuOpen(false)}
                 >
-                  Contact
+                  Contactez
                 </a>
-                <a
-                  href="#about"
-                  className="block px-3 py-2 text-foreground hover:text-primary transition-colors"
-                  onClick={() => setIsMobileMenuOpen(false)}
+                <button
+                  className="w-full text-left px-3 py-2 text-primary hover:text-primary/80 transition-colors border border-primary rounded-md"
+                  onClick={() => {
+                    setIsMobileMenuOpen(false)
+                    setIsAppointmentModalOpen(true)
+                  }}
                 >
-                  À Propos
-                </a>
+                  Prendre un rdv
+                </button>
               </div>
             </div>
           )}
@@ -620,8 +658,20 @@ export default function Home() {
         </div>
       </section>
 
-      <section id="services" className="py-20 bg-gradient-to-br from-black to-gray-900 border-t border-gray-800">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <section id="services" className="py-20 border-t border-gray-800 relative overflow-hidden">
+        {/* Background Image */}
+        <div 
+          className="absolute inset-0 bg-cover bg-center bg-no-repeat opacity-60"
+          style={{
+            backgroundImage: 'url(/images/modelady.png)',
+            filter: 'brightness(0.8) contrast(1.0)'
+          }}
+        />
+        
+        {/* Overlay gradient */}
+        <div className="absolute inset-0 bg-gradient-to-br from-black/40 via-black/20 to-gray-900/40" />
+        
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
           <div className="text-center mb-16">
             <h2 className="text-4xl font-bold font-space-grotesk mb-4 text-white">Nos Services</h2>
             <p className="text-xl text-gray-300 max-w-2xl mx-auto">
@@ -630,42 +680,92 @@ export default function Home() {
           </div>
 
           <div className="grid md:grid-cols-3 gap-8">
-            <Card className="group hover:shadow-xl transition-all duration-300 hover:-translate-y-2 bg-gray-900 border-gray-700 hover:border-primary/50">
-              <CardHeader>
-                <div className="w-12 h-12 bg-primary/20 rounded-lg flex items-center justify-center mb-4 group-hover:bg-primary group-hover:text-primary-foreground transition-colors border border-primary/30">
-                  <Film className="w-6 h-6" />
-                </div>
-                <CardTitle className="font-space-grotesk text-white">Casting Cinéma</CardTitle>
-                <CardDescription className="text-gray-300">
-                  Sélection de talents pour longs métrages, courts métrages et productions indépendantes
-                </CardDescription>
-              </CardHeader>
-            </Card>
+            <FlipCard
+              frontContent={
+                <Card className="w-full h-full bg-black border-2 border-gray-800 hover:border-red-500/50 transition-all duration-300">
+                  <CardHeader className="h-full flex flex-col justify-center text-center">
+                    <div className="w-16 h-16 bg-red-500/20 rounded-full flex items-center justify-center mb-6 mx-auto border-2 border-red-500/30">
+                      <Film className="w-8 h-8 text-red-500" />
+                    </div>
+                    <CardTitle className="font-space-grotesk text-white text-xl mb-3">Casting Cinéma</CardTitle>
+                    <CardDescription className="text-gray-400 text-sm leading-relaxed">
+                      Sélection de talents pour longs métrages, courts métrages et productions indépendantes
+                    </CardDescription>
+                  </CardHeader>
+                </Card>
+              }
+              backContent={
+                <Card className="w-full h-full bg-black border-2 border-red-500/50">
+                  <CardHeader className="h-full flex flex-col justify-center text-center">
+                    <div className="w-16 h-16 bg-red-500/30 rounded-full flex items-center justify-center mb-6 mx-auto border-2 border-red-500/50">
+                      <Film className="w-8 h-8 text-red-500" />
+                    </div>
+                    <CardTitle className="font-space-grotesk text-red-500 text-xl mb-3">Casting Cinéma</CardTitle>
+                    <CardDescription className="text-gray-300 text-xs mb-4 leading-relaxed">
+                      Découvrez nos services de casting pour le cinéma : auditions, sélections, et accompagnement personnalisé pour vos projets cinématographiques.
+                    </CardDescription>
+                  </CardHeader>
+                </Card>
+              }
+            />
 
-            <Card className="group hover:shadow-xl transition-all duration-300 hover:-translate-y-2 bg-gray-900 border-gray-700 hover:border-secondary/50">
-              <CardHeader>
-                <div className="w-12 h-12 bg-secondary/20 rounded-lg flex items-center justify-center mb-4 group-hover:bg-secondary group-hover:text-secondary-foreground transition-colors border border-secondary/30">
-                  <Users className="w-6 h-6" />
-                </div>
-                <CardTitle className="font-space-grotesk text-white">Casting TV</CardTitle>
-                <CardDescription className="text-gray-300">
-                  Recrutement pour séries, émissions, publicités et contenus télévisuels
-                </CardDescription>
-              </CardHeader>
-            </Card>
+            <FlipCard
+              frontContent={
+                <Card className="w-full h-full bg-black border-2 border-gray-800 hover:border-orange-500/50 transition-all duration-300">
+                  <CardHeader className="h-full flex flex-col justify-center text-center">
+                    <div className="w-16 h-16 bg-orange-500/20 rounded-full flex items-center justify-center mb-6 mx-auto border-2 border-orange-500/30">
+                      <Users className="w-8 h-8 text-orange-500" />
+                    </div>
+                    <CardTitle className="font-space-grotesk text-white text-xl mb-3">Casting TV</CardTitle>
+                    <CardDescription className="text-gray-400 text-sm leading-relaxed">
+                      Recrutement pour séries, émissions, publicités et contenus télévisuels
+                    </CardDescription>
+                  </CardHeader>
+                </Card>
+              }
+              backContent={
+                <Card className="w-full h-full bg-black border-2 border-orange-500/50">
+                  <CardHeader className="h-full flex flex-col justify-center text-center">
+                    <div className="w-16 h-16 bg-orange-500/30 rounded-full flex items-center justify-center mb-6 mx-auto border-2 border-orange-500/50">
+                      <Users className="w-8 h-8 text-orange-500" />
+                    </div>
+                    <CardTitle className="font-space-grotesk text-orange-500 text-xl mb-3">Casting TV</CardTitle>
+                    <CardDescription className="text-gray-300 text-xs mb-4 leading-relaxed">
+                      Notre expertise en casting télévisuel : séries, émissions, publicités et contenus pour tous types de médias.
+                    </CardDescription>
+                  </CardHeader>
+                </Card>
+              }
+            />
 
-            <Card className="group hover:shadow-xl transition-all duration-300 hover:-translate-y-2 bg-gray-900 border-gray-700 hover:border-accent/50">
-              <CardHeader>
-                <div className="w-12 h-12 bg-accent/20 rounded-lg flex items-center justify-center mb-4 group-hover:bg-accent group-hover:text-accent-foreground transition-colors border border-accent/30">
-                  <Award className="w-6 h-6" />
-                </div>
-                <CardTitle className="font-space-grotesk text-white">Street Casting</CardTitle>
-                <CardDescription className="text-gray-300">
-                  Sélection de profils authentiques repérés en milieu urbain pour des projets audiovisuels ou
-                  publicitaires
-                </CardDescription>
-              </CardHeader>
-            </Card>
+            <FlipCard
+              frontContent={
+                <Card className="w-full h-full bg-black border-2 border-gray-800 hover:border-yellow-500/50 transition-all duration-300">
+                  <CardHeader className="h-full flex flex-col justify-center text-center">
+                    <div className="w-16 h-16 bg-yellow-500/20 rounded-full flex items-center justify-center mb-6 mx-auto border-2 border-yellow-500/30">
+                      <Award className="w-8 h-8 text-yellow-500" />
+                    </div>
+                    <CardTitle className="font-space-grotesk text-white text-xl mb-3">Street Casting</CardTitle>
+                    <CardDescription className="text-gray-400 text-sm leading-relaxed">
+                      Sélection de profils authentiques repérés en milieu urbain pour des projets audiovisuels ou publicitaires
+                    </CardDescription>
+                  </CardHeader>
+                </Card>
+              }
+              backContent={
+                <Card className="w-full h-full bg-black border-2 border-yellow-500/50">
+                  <CardHeader className="h-full flex flex-col justify-center text-center">
+                    <div className="w-16 h-16 bg-yellow-500/30 rounded-full flex items-center justify-center mb-6 mx-auto border-2 border-yellow-500/50">
+                      <Award className="w-8 h-8 text-yellow-500" />
+                    </div>
+                    <CardTitle className="font-space-grotesk text-yellow-500 text-xl mb-3">Street Casting</CardTitle>
+                    <CardDescription className="text-gray-300 text-xs mb-4 leading-relaxed">
+                      Découvrez des talents authentiques repérés dans les rues : profils naturels et personnalités uniques pour vos projets.
+                    </CardDescription>
+                  </CardHeader>
+                </Card>
+              }
+            />
           </div>
         </div>
       </section>
@@ -758,7 +858,9 @@ export default function Home() {
         </div>
       </section>
 
-      <VideoCollaboration />
+      <section id="collaborations" className="py-20 bg-gradient-to-br from-background to-muted/30">
+        <VideoCollaboration />
+      </section>
 
       <section id="portfolio" className="py-20 bg-gradient-to-br from-gray-900 to-black border-t border-gray-800">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -830,10 +932,10 @@ export default function Home() {
         </div>
       </section>
 
-      <section id="casting" className="py-20 bg-black border-t border-gray-800">
+      <section id="castings" className="py-20 bg-black border-t border-gray-800">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-16">
-            <h2 className="text-4xl font-bold font-space-grotesk mb-4 text-white">Castings en Cours</h2>
+            <h2 className="text-4xl font-bold font-space-grotesk mb-4 text-white">Castings</h2>
             <p className="text-xl text-gray-300">Découvrez les opportunités actuelles</p>
           </div>
 
@@ -930,7 +1032,7 @@ export default function Home() {
             <p className="text-lg text-gray-300">En collaboration avec nos partenaires de confiance</p>
           </div>
           {partnerLogos.filter((l: any) => (l.category || 'partner') === 'partner').length > 0 ? (
-            <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-6 gap-8 items-center">
+            <div className="flex items-center justify-center space-x-8 flex-wrap">
               {partnerLogos
                 .filter((l: any) => (l.category || 'partner') === 'partner')
                 .map((logo: any) => (
@@ -1012,6 +1114,50 @@ export default function Home() {
               <div className="text-sm text-gray-300">Satisfaction Client</div>
             </div>
           </div>
+        </div>
+      </section>
+
+      <section id="testimonials" className="py-20 bg-black border-t border-gray-800">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="text-center mb-16">
+            <h2 className="text-4xl font-bold font-space-grotesk mb-4 text-white">Témoignages</h2>
+            <p className="text-xl text-gray-300">Ce que disent nos clients</p>
+          </div>
+
+          {testimonials && testimonials.length > 0 ? (
+            <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
+              {testimonials.map((testimonial) => (
+                <Card key={testimonial.id} className="bg-gray-900 border-gray-700 hover:border-primary/50 transition-all duration-300">
+                  <CardHeader>
+                    <div className="flex items-center mb-4">
+                      <div className="w-12 h-12 bg-primary/20 rounded-full flex items-center justify-center mr-4">
+                        <Quote className="w-6 h-6 text-primary" />
+                      </div>
+                      <div>
+                        <CardTitle className="font-space-grotesk text-white">{testimonial.name}</CardTitle>
+                        <CardDescription className="text-gray-400">{testimonial.company}</CardDescription>
+                      </div>
+                    </div>
+                  </CardHeader>
+                  <CardContent>
+                    <p className="text-gray-300 italic">"{testimonial.content}"</p>
+                    <div className="flex items-center mt-4">
+                      {[...Array(5)].map((_, i) => (
+                        <Star
+                          key={i}
+                          className={`w-4 h-4 ${
+                            i < (testimonial.rating || 5) ? 'text-yellow-500 fill-current' : 'text-gray-600'
+                          }`}
+                        />
+                      ))}
+                    </div>
+                  </CardContent>
+                </Card>
+              ))}
+            </div>
+          ) : (
+            <div className="text-center text-gray-300">Aucun témoignage pour le moment.</div>
+          )}
         </div>
       </section>
 
@@ -1098,7 +1244,7 @@ export default function Home() {
                 <CardContent className="space-y-4">
                   <div className="flex items-center space-x-3">
                     <Mail className="w-5 h-5 text-primary" />
-                    <span className="text-gray-300">contact@castpro.tn</span>
+                    <span className="text-gray-300">castpro.hf@gmail.com</span>
                   </div>
                   <div className="flex items-center space-x-3">
                     <Phone className="w-5 h-5 text-primary" />
@@ -1111,6 +1257,27 @@ export default function Home() {
                       <br />
                       Tunis, Tunisie
                     </span>
+                  </div>
+                  <div className="flex items-center space-x-3">
+                    <a 
+                      href="https://www.instagram.com/castpro_tunisie" 
+                      target="_blank" 
+                      rel="noreferrer"
+                      className="flex items-center space-x-3 text-gray-300 hover:text-primary transition-colors"
+                    >
+                      <div className="w-6 h-6 flex items-center justify-center">
+                        <img
+                          src="/images/Instagram-Logo.png"
+                          alt="Instagram CastPro Tunisie"
+                          className="w-6 h-6 object-contain"
+                          onError={(e) => {
+                            const img = e.target as HTMLImageElement
+                            img.src = '/placeholder-logo.png'
+                          }}
+                        />
+                      </div>
+                      <span>@castpro_tunisie</span>
+                    </a>
                   </div>
                   <LocationMap />
                 </CardContent>
@@ -1216,7 +1383,7 @@ export default function Home() {
                       </label>
                       <select
                         id="selectedDate"
-                        className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-primary focus:ring-primary sm:text-sm"
+                        className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-primary focus:ring-primary sm:text-sm text-gray-900 bg-white"
                         value={appointmentForm.selectedDate}
                         onChange={(e) => setAppointmentForm({ ...appointmentForm, selectedDate: e.target.value })}
                         required
@@ -1235,7 +1402,7 @@ export default function Home() {
                       </label>
                       <select
                         id="selectedTime"
-                        className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-primary focus:ring-primary sm:text-sm"
+                        className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-primary focus:ring-primary sm:text-sm text-gray-900 bg-white"
                         value={appointmentForm.selectedTime}
                         onChange={(e) => setAppointmentForm({ ...appointmentForm, selectedTime: e.target.value })}
                         required
@@ -1302,7 +1469,26 @@ export default function Home() {
             <p className="text-sm text-muted-foreground">
               &copy; {new Date().getFullYear()} CastPro. Tous droits réservés.
             </p>
-            <div className="mt-4 md:mt-0 flex space-x-4">
+            <div className="mt-4 md:mt-0 flex space-x-4 items-center">
+              {/* Instagram Logo */}
+              <a 
+                href="https://www.instagram.com/castpro_tunisie" 
+                target="_blank" 
+                rel="noreferrer"
+                className="text-muted-foreground hover:text-primary transition-colors"
+                aria-label="Suivez-nous sur Instagram"
+              >
+                <img
+                  src="/images/Instagram-Logo.png"
+                  alt="Instagram CastPro Tunisie"
+                  className="h-8 w-8 object-contain"
+                  onError={(e) => {
+                    const img = e.target as HTMLImageElement
+                    img.src = '/placeholder-logo.png'
+                  }}
+                />
+              </a>
+              
               <a href="#" className="text-sm text-muted-foreground hover:text-primary">
                 Conditions d'utilisation
               </a>

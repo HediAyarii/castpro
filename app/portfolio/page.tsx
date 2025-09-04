@@ -52,8 +52,10 @@ export default function PortfolioPage() {
   // Filtrer les talents selon l'onglet actif
   const getFilteredTalents = () => {
     return talents.filter((talent) => {
-      const matchesCategory = selectedCategory === "all" || talent.category === selectedCategory
-      const matchesSearch = talent.name.toLowerCase().includes(searchTerm.toLowerCase())
+      const matchesCategory = selectedCategory === "all" || talent.category?.toLowerCase() === selectedCategory.toLowerCase()
+      const matchesSearch = talent.name?.toLowerCase().includes(searchTerm.toLowerCase()) || 
+                           talent.description?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                           talent.age?.toLowerCase().includes(searchTerm.toLowerCase())
       return matchesCategory && matchesSearch
     })
   }
@@ -64,9 +66,9 @@ export default function PortfolioPage() {
   useEffect(() => {
     setCategories([
       { id: "all", name: "Tous", count: talents.length },
-      { id: "enfants", name: "Enfants", count: talents.filter(t => t.category === "enfants").length },
-      { id: "jeunes", name: "Jeunes", count: talents.filter(t => t.category === "jeunes").length },
-      { id: "seniors", name: "Seniors", count: talents.filter(t => t.category === "seniors").length },
+      { id: "enfants", name: "Enfants", count: talents.filter(t => t.category?.toLowerCase() === "enfants").length },
+      { id: "jeunes", name: "Jeunes", count: talents.filter(t => t.category?.toLowerCase() === "jeunes").length },
+      { id: "seniors", name: "Seniors", count: talents.filter(t => t.category?.toLowerCase() === "seniors").length },
     ])
   }, [talents])
 
@@ -288,7 +290,7 @@ export default function PortfolioPage() {
             </div>
           ) : (
             <div className="grid md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-              {talents.map((talent) => (
+              {filteredTalents.map((talent) => (
                 <Card
                   key={talent.id}
                   className="group overflow-hidden hover:shadow-xl transition-all duration-300 hover:-translate-y-2"
@@ -321,7 +323,7 @@ export default function PortfolioPage() {
             </div>
           )}
 
-          {talents.length === 0 && (
+          {filteredTalents.length === 0 && !loading && (
             <div className="text-center py-12">
               <p className="text-muted-foreground text-lg">Aucun talent public disponible.</p>
             </div>

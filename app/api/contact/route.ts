@@ -34,7 +34,7 @@ export async function POST(request: NextRequest) {
     // Email content
     const mailOptions = {
       from: 'castpro.contact@gmail.com',
-      to: 'castpro.contact@gmail.com',
+      to: 'castpro.hf@gmail.com',
       subject: `Nouveau message de contact - ${name}`,
       html: `
         <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
