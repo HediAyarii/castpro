@@ -1463,38 +1463,168 @@ export default function Home() {
       </button>
 
       {/* Footer */}
-      <footer className="bg-background border-t border-border py-12">
+      <footer className="bg-gradient-to-br from-gray-900 via-black to-gray-900 border-t border-gray-800">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex flex-col md:flex-row justify-between items-center">
-            <p className="text-sm text-muted-foreground">
-              &copy; {new Date().getFullYear()} CastPro. Tous droits réservés.
-            </p>
-            <div className="mt-4 md:mt-0 flex space-x-4 items-center">
-              {/* Instagram Logo */}
-              <a 
-                href="https://www.instagram.com/castpro_tunisie" 
-                target="_blank" 
-                rel="noreferrer"
-                className="text-muted-foreground hover:text-primary transition-colors"
-                aria-label="Suivez-nous sur Instagram"
-              >
-                <img
-                  src="/images/Instagram-Logo.png"
-                  alt="Instagram CastPro Tunisie"
-                  className="h-8 w-8 object-contain"
-                  onError={(e) => {
-                    const img = e.target as HTMLImageElement
-                    img.src = '/placeholder-logo.png'
-                  }}
-                />
-              </a>
-              
-              <a href="#" className="text-sm text-muted-foreground hover:text-primary">
-                Conditions d'utilisation
-              </a>
-              <a href="#" className="text-sm text-muted-foreground hover:text-primary">
-                Politique de confidentialité
-              </a>
+          {/* Main Footer Content */}
+          <div className="py-16">
+            <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-8">
+              {/* Company Info */}
+              <div className="lg:col-span-1">
+                <div className="flex items-center mb-6">
+                  <img
+                    src="/images/castpro.png"
+                    alt="CastPro Logo"
+                    className="h-12 w-auto"
+                  />
+                </div>
+                <p className="text-gray-300 mb-6 leading-relaxed">
+                  CastPro Tunisie - Votre partenaire de confiance pour tous vos projets de casting. 
+                  Découvrez des talents exceptionnels pour le cinéma, la télévision et la publicité.
+                </p>
+                <div className="flex space-x-4">
+                  <a 
+                    href="https://www.instagram.com/castpro_tunisie" 
+                    target="_blank" 
+                    rel="noreferrer"
+                    className="text-gray-400 hover:text-primary transition-colors"
+                    aria-label="Suivez-nous sur Instagram"
+                  >
+                    <img
+                      src="/images/Instagram-Logo.png"
+                      alt="Instagram CastPro Tunisie"
+                      className="h-8 w-8 object-contain"
+                      onError={(e) => {
+                        const img = e.target as HTMLImageElement
+                        img.src = '/placeholder-logo.png'
+                      }}
+                    />
+                  </a>
+                </div>
+              </div>
+
+              {/* Services */}
+              <div>
+                <h3 className="text-lg font-semibold text-white mb-6">Nos Services</h3>
+                <ul className="space-y-3">
+                  <li>
+                    <a href="#services" className="text-gray-300 hover:text-primary transition-colors">
+                      Casting Cinéma
+                    </a>
+                  </li>
+                  <li>
+                    <a href="#services" className="text-gray-300 hover:text-primary transition-colors">
+                      Casting TV
+                    </a>
+                  </li>
+                  <li>
+                    <a href="#services" className="text-gray-300 hover:text-primary transition-colors">
+                      Street Casting
+                    </a>
+                  </li>
+                  <li>
+                    <a href="#castings" className="text-gray-300 hover:text-primary transition-colors">
+                      Castings Ouverts
+                    </a>
+                  </li>
+                  <li>
+                    <a href="#portfolio" className="text-gray-300 hover:text-primary transition-colors">
+                      Portfolio Secret
+                    </a>
+                  </li>
+                </ul>
+              </div>
+
+              {/* Quick Links */}
+              <div>
+                <h3 className="text-lg font-semibold text-white mb-6">Liens Rapides</h3>
+                <ul className="space-y-3">
+                  <li>
+                    <Link href="/portfolio" className="text-gray-300 hover:text-primary transition-colors">
+                      Portfolio Public
+                    </Link>
+                  </li>
+                  <li>
+                    <a href="#about" className="text-gray-300 hover:text-primary transition-colors">
+                      À Propos
+                    </a>
+                  </li>
+                  <li>
+                    <a href="#talents" className="text-gray-300 hover:text-primary transition-colors">
+                      Nos Talents
+                    </a>
+                  </li>
+                  <li>
+                    <a href="#testimonials" className="text-gray-300 hover:text-primary transition-colors">
+                      Témoignages
+                    </a>
+                  </li>
+                  <li>
+                    <a href="#contact" className="text-gray-300 hover:text-primary transition-colors">
+                      Contact
+                    </a>
+                  </li>
+                </ul>
+              </div>
+
+              {/* Contact Info */}
+              <div>
+                <h3 className="text-lg font-semibold text-white mb-6">Contact</h3>
+                <div className="space-y-4">
+                  <div className="flex items-start space-x-3">
+                    <Mail className="w-5 h-5 text-primary mt-1 flex-shrink-0" />
+                    <div>
+                      <p className="text-gray-300">castpro.hf@gmail.com</p>
+                    </div>
+                  </div>
+                  <div className="flex items-start space-x-3">
+                    <Phone className="w-5 h-5 text-primary mt-1 flex-shrink-0" />
+                    <div>
+                      <p className="text-gray-300">+216 53 456 789</p>
+                    </div>
+                  </div>
+                  <div className="flex items-start space-x-3">
+                    <MapPin className="w-5 h-5 text-primary mt-1 flex-shrink-0" />
+                    <div>
+                      <p className="text-gray-300">
+                        Avenue de la République<br />
+                        Tunis, Tunisie
+                      </p>
+                    </div>
+                  </div>
+                </div>
+                
+                <div className="mt-6">
+                  <Button 
+                    onClick={() => setIsAppointmentModalOpen(true)}
+                    className="w-full bg-primary hover:bg-primary/90 text-white"
+                  >
+                    Prendre un Rendez-vous
+                  </Button>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          {/* Bottom Footer */}
+          <div className="border-t border-gray-800 py-8">
+            <div className="flex flex-col md:flex-row justify-between items-center">
+              <div className="text-sm text-gray-400 mb-4 md:mb-0">
+                &copy; {new Date().getFullYear()} CastPro Tunisie. Tous droits réservés.
+              </div>
+              <div className="flex flex-wrap gap-6 text-sm">
+                <a href="#" className="text-gray-400 hover:text-primary transition-colors">
+                  Conditions d'utilisation
+                </a>
+                <a href="#" className="text-gray-400 hover:text-primary transition-colors">
+                  Politique de confidentialité
+                </a>
+                <a href="#" className="text-gray-400 hover:text-primary transition-colors">
+                  Mentions légales
+                </a>
+                <a href="#" className="text-gray-400 hover:text-primary transition-colors">
+                  Cookies
+                </a>
+              </div>
             </div>
           </div>
         </div>
