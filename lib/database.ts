@@ -122,7 +122,7 @@ export async function createPortfolioItem(data: any) {
   }
 }
 
-export async function updatePortfolioItem(id: number, data: any) {
+export async function updatePortfolioItem(id: string, data: any) {
   try {
     const result = await sql`
       UPDATE portfolio_items 
@@ -139,7 +139,7 @@ export async function updatePortfolioItem(id: number, data: any) {
   }
 }
 
-export async function deletePortfolioItem(id: number) {
+export async function deletePortfolioItem(id: string) {
   try {
     await sql`DELETE FROM portfolio_items WHERE id = ${id}`
     return true

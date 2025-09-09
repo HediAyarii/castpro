@@ -39,7 +39,7 @@ export async function DELETE(request: Request) {
     if (!id) {
       return NextResponse.json({ error: "ID is required" }, { status: 400 })
     }
-    await deletePortfolioItem(Number.parseInt(id))
+    await deletePortfolioItem(id)
     return NextResponse.json({ success: true })
   } catch (error) {
     return NextResponse.json({ error: "Failed to delete portfolio item" }, { status: 500 })
