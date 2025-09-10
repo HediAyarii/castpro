@@ -1,5 +1,5 @@
--- Script pour créer une clé d'accès de test
--- Cette clé permettra d'accéder au portfolio secret
+-- Create test access key for portfolio secret
+-- This script runs after the database schema is created
 
 INSERT INTO access_keys (id, name, key, permissions, created_at, expires_at, is_active)
 VALUES (
@@ -11,6 +11,3 @@ VALUES (
   NULL, -- Pas d'expiration
   true
 ) ON CONFLICT (key) DO NOTHING;
-
--- Vérifier que la clé a été créée
-SELECT * FROM access_keys WHERE key = 'ck_test_portfolio_secret_2024';

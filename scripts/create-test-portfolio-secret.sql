@@ -13,7 +13,7 @@ INSERT INTO portfolio_items (id, name, age, category, image, description, experi
   'https://hebbkx1anhila5yf.public.blob.vercel-storage.com/cp3.jpg-bDYroREYAoSa4NByuLk5PULtyIWJX2.jpeg',
   'Actrice polyvalente spécialisée dans les rôles complexes et émotionnels. Talent exceptionnel pour les personnages profonds.',
   '6 ans',
-  'Cinéma d\'Auteur, Drame, Comédie',
+  'Cinéma d''Auteur, Drame, Comédie',
   true,
   NOW()
 );
@@ -25,9 +25,9 @@ INSERT INTO portfolio_items (id, name, age, category, image, description, experi
   32,
   'elite',
   'https://hebbkx1anhila5yf.public.blob.vercel-storage.com/cp2.jpg-R9zachVmq4bHRgGeeUkjOAPEB9mo3f.jpeg',
-  'Comédien de formation classique, maître de l\'art dramatique. Spécialiste du théâtre et du cinéma d\'auteur.',
+  'Comédien de formation classique, maître de l''art dramatique. Spécialiste du théâtre et du cinéma d''auteur.',
   '10 ans',
-  'Théâtre Classique, Cinéma d\'Auteur, Drame',
+  'Théâtre Classique, Cinéma d''Auteur, Drame',
   true,
   NOW()
 );
@@ -39,7 +39,7 @@ INSERT INTO portfolio_items (id, name, age, category, image, description, experi
   28,
   'premium',
   'https://hebbkx1anhila5yf.public.blob.vercel-storage.com/cp4.jpg-DI5re0Dg3sWflQwN6AKd0gapxSzsqj.jpeg',
-  'Triple talent : chant, danse et jeu d\'acteur exceptionnel. Spécialisée dans les comédies musicales et le théâtre.',
+  'Triple talent : chant, danse et jeu d''acteur exceptionnel. Spécialisée dans les comédies musicales et le théâtre.',
   '8 ans',
   'Comédie Musicale, Théâtre, Chant, Danse',
   true,

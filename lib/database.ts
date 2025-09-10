@@ -1,12 +1,25 @@
 import { Pool } from 'pg'
 
-const pool = new Pool({
-  host: process.env.DB_HOST || 'localhost',
-  port: parseInt(process.env.DB_PORT || '5432'),
-  database: process.env.DB_NAME || 'castpro_db',
-  user: process.env.DB_USER || 'castpro_user',
-  password: process.env.DB_PASSWORD || 'castpro_password_2024',
-})
+// Parse DATABASE_URL if available, otherwise use individual environment variables
+let poolConfig: any = {}
+
+if (process.env.DATABASE_URL) {
+  // Use DATABASE_URL from docker-compose.yml
+  poolConfig = {
+    connectionString: process.env.DATABASE_URL,
+  }
+} else {
+  // Fallback to individual environment variables
+  poolConfig = {
+    host: process.env.DB_HOST || 'localhost',
+    port: parseInt(process.env.DB_PORT || '5432'),
+    database: process.env.DB_NAME || 'castpro',
+    user: process.env.DB_USER || 'postgres',
+    password: process.env.DB_PASSWORD || 'postgres',
+  }
+}
+
+const pool = new Pool(poolConfig)
 
 // Helper function to execute SQL queries
 async function sql(strings: TemplateStringsArray, ...values: any[]) {
