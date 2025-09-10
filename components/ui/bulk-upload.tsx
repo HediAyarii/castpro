@@ -40,6 +40,11 @@ export function BulkUpload({ onBulkUpload, isOpen, onClose, activeTab = "main" }
     })
 
     try {
+      console.log('Début de l\'upload en masse...')
+      console.log(`Fichiers sélectionnés: ${selectedFiles.length}`)
+      console.log(`Catégorie: ${selectedCategory}`)
+      console.log(`Onglet actif: ${activeTab}`)
+
       const formData = new FormData()
       selectedFiles.forEach(file => {
         formData.append('files', file)
@@ -52,11 +57,16 @@ export function BulkUpload({ onBulkUpload, isOpen, onClose, activeTab = "main" }
         body: formData,
       })
 
+      console.log('Réponse reçue:', response.status, response.statusText)
+
       if (!response.ok) {
-        throw new Error('Erreur lors de l\'upload en masse')
+        const errorData = await response.json()
+        console.error('Erreur de réponse:', errorData)
+        throw new Error(errorData.error || 'Erreur lors de l\'upload en masse')
       }
 
       const result = await response.json()
+      console.log('Résultat de l\'upload:', result)
       
       if (result.success) {
         // Convertir les fichiers uploadés en format portfolio
@@ -71,6 +81,7 @@ export function BulkUpload({ onBulkUpload, isOpen, onClose, activeTab = "main" }
           is_secret: file.is_secret // Utiliser le paramètre retourné par l'API
         }))
 
+        console.log('Éléments de portfolio créés:', portfolioItems)
         onBulkUpload(portfolioItems)
         
         // Réinitialiser le formulaire
@@ -86,7 +97,7 @@ export function BulkUpload({ onBulkUpload, isOpen, onClose, activeTab = "main" }
       console.error('Erreur upload en masse:', error)
       setUploadProgress(prev => prev ? {
         ...prev,
-        errors: [...prev.errors, 'Erreur lors de l\'upload en masse']
+        errors: [...prev.errors, error instanceof Error ? error.message : 'Erreur lors de l\'upload en masse']
       } : null)
     } finally {
       setIsUploading(false)
