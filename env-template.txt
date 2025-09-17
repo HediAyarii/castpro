@@ -1,0 +1,17 @@
+# Database Configuration for CastPro
+# Copy this content to a .env file in your project root
+
+DATABASE_URL=postgresql://postgres:postgres@localhost:5432/castpro
+
+# Alternative individual variables
+DB_HOST=localhost
+DB_PORT=5432
+DB_NAME=castpro
+DB_USER=postgres
+DB_PASSWORD=postgres
+
+# JWT Secret
+JWT_SECRET=your-super-secret-jwt-key-change-this-in-production
+
+# Upload Secret
+UPLOAD_SECRET=your-upload-secret-key-change-this-in-production

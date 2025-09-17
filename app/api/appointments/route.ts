@@ -13,10 +13,16 @@ export async function GET() {
 export async function POST(request: Request) {
   try {
     const data = await request.json()
+    console.log('Creating appointment with data:', data)
     const appointment = await createAppointment(data)
+    console.log('Appointment created successfully:', appointment)
     return NextResponse.json(appointment)
   } catch (error) {
-    return NextResponse.json({ error: "Failed to create appointment" }, { status: 500 })
+    console.error('Error in POST /api/appointments:', error)
+    return NextResponse.json({ 
+      error: "Failed to create appointment", 
+      details: error instanceof Error ? error.message : 'Unknown error' 
+    }, { status: 500 })
   }
 }
 

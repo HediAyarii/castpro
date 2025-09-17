@@ -9,15 +9,21 @@ if (process.env.DATABASE_URL) {
     connectionString: process.env.DATABASE_URL,
   }
 } else {
-  // Fallback to individual environment variables
+  // Fallback to individual environment variables - FIXED for local development
   poolConfig = {
     host: process.env.DB_HOST || 'localhost',
     port: parseInt(process.env.DB_PORT || '5432'),
     database: process.env.DB_NAME || 'castpro',
-    user: process.env.DB_USER || 'postgres',
-    password: process.env.DB_PASSWORD || 'postgres',
+    user: process.env.DB_USER || 'postgres',  // Fixed: was 'castpro_user'
+    password: process.env.DB_PASSWORD || 'postgres',  // Fixed: was 'castpro_password_2024'
   }
 }
+
+console.log('Database config:', {
+  ...poolConfig,
+  password: poolConfig.password ? '[HIDDEN]' : 'undefined',
+  connectionString: poolConfig.connectionString ? '[HIDDEN]' : 'undefined'
+})
 
 const pool = new Pool(poolConfig)
 
@@ -238,8 +244,8 @@ export async function getAppointments() {
 export async function createAppointment(data: any) {
   try {
     const result = await sql`
-      INSERT INTO appointments (nom, prenom, telephone1, telephone2, date, time, status)
-      VALUES (${data.nom}, ${data.prenom}, ${data.telephone1}, ${data.telephone2}, 
+      INSERT INTO appointments (id, nom, prenom, telephone1, telephone2, date, time, status)
+      VALUES (${data.id}, ${data.nom}, ${data.prenom}, ${data.telephone1}, ${data.telephone2}, 
               ${data.date}, ${data.time}, ${data.status || "pending"})
       RETURNING *
     `

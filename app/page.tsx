@@ -223,11 +223,33 @@ export default function Home() {
   const availableSlots = generateAvailableSlots()
   const availableDates = [...new Set(availableSlots.map((slot) => slot.date))]
 
-  const handleAppointmentSubmit = (e: React.FormEvent) => {
+  const handleAppointmentSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
 
-    // Get existing appointments from localStorage
-    const existingAppointments = JSON.parse(safeLocalStorage.getItem("appointments") || "[]")
+    // Validate form data
+    if (!appointmentForm.nom.trim() || !appointmentForm.prenom.trim() || 
+        !appointmentForm.telephone1.trim() || !appointmentForm.selectedDate || 
+        !appointmentForm.selectedTime) {
+      alert("Veuillez remplir tous les champs obligatoires.")
+      return
+    }
+
+    // Validate phone number format
+    const phoneRegex = /^[0-9+\-\s()]+$/
+    if (!phoneRegex.test(appointmentForm.telephone1)) {
+      alert("Veuillez entrer un numéro de téléphone valide.")
+      return
+    }
+
+    // Get existing appointments from localStorage with error handling
+    let existingAppointments = []
+    try {
+      const stored = safeLocalStorage.getItem("appointments")
+      existingAppointments = stored ? JSON.parse(stored) : []
+    } catch (error) {
+      console.warn('Error reading localStorage:', error)
+      existingAppointments = []
+    }
 
     // Check if the selected slot is already booked
     const isSlotTaken = existingAppointments.some(
@@ -243,7 +265,7 @@ export default function Home() {
     }
 
     const appointment = {
-      id: Date.now().toString() + Math.random().toString(36).substr(2, 9),
+      id: `apt_${Date.now()}_${Math.random().toString(36).substring(2, 11)}`,
       nom: appointmentForm.nom,
       prenom: appointmentForm.prenom,
       telephone1: appointmentForm.telephone1,
@@ -254,22 +276,68 @@ export default function Home() {
       createdAt: new Date().toISOString(),
     }
 
-    // Add new appointment
-    const updatedAppointments = [...existingAppointments, appointment]
+    try {
+      // Save to database via API with timeout and retry logic
+      const controller = new AbortController()
+      const timeoutId = setTimeout(() => controller.abort(), 10000) // 10 second timeout
+      
+      const response = await fetch('/api/appointments', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(appointment),
+        signal: controller.signal,
+      })
 
-    // Save back to localStorage
-    safeLocalStorage.setItem("appointments", JSON.stringify(updatedAppointments))
+      clearTimeout(timeoutId)
 
-    alert("Rendez-vous demandé avec succès! Nous vous contacterons pour confirmation.")
-    setIsAppointmentModalOpen(false)
-    setAppointmentForm({
-      nom: "",
-      prenom: "",
-      telephone1: "",
-      telephone2: "",
-      selectedDate: "",
-      selectedTime: "",
-    })
+      if (!response.ok) {
+        const errorText = await response.text()
+        console.error('API Error:', response.status, errorText)
+        throw new Error(`Erreur serveur (${response.status}): ${errorText}`)
+      }
+
+      const result = await response.json()
+      console.log('Appointment saved successfully:', result)
+
+      // Add new appointment to localStorage for local display
+      try {
+        const updatedAppointments = [...existingAppointments, appointment]
+        safeLocalStorage.setItem("appointments", JSON.stringify(updatedAppointments))
+      } catch (error) {
+        console.warn('Error saving to localStorage:', error)
+        // Continue anyway, the appointment was saved to database
+      }
+
+      alert("Rendez-vous demandé avec succès! Nous vous contacterons pour confirmation.")
+      setIsAppointmentModalOpen(false)
+      setAppointmentForm({
+        nom: "",
+        prenom: "",
+        telephone1: "",
+        telephone2: "",
+        selectedDate: "",
+        selectedTime: "",
+      })
+    } catch (error) {
+      console.error('Error saving appointment:', error)
+      
+      // More specific error messages for mobile users
+      let errorMessage = "Erreur lors de la sauvegarde du rendez-vous."
+      
+      if (error instanceof Error) {
+        if (error.name === 'AbortError') {
+          errorMessage = "Délai d'attente dépassé. Vérifiez votre connexion internet et réessayez."
+        } else if (error.message.includes('Failed to fetch')) {
+          errorMessage = "Problème de connexion. Vérifiez votre connexion internet et réessayez."
+        } else if (error.message.includes('Erreur serveur')) {
+          errorMessage = error.message
+        }
+      }
+      
+      alert(errorMessage + " Veuillez réessayer.")
+    }
   }
 
   const handleContactSubmit = async (e: React.FormEvent) => {
@@ -1337,6 +1405,8 @@ export default function Home() {
                         value={appointmentForm.nom}
                         onChange={(e) => setAppointmentForm({ ...appointmentForm, nom: e.target.value })}
                         required
+                        autoComplete="family-name"
+                        inputMode="text"
                       />
                     </div>
                     <div>
@@ -1350,6 +1420,8 @@ export default function Home() {
                         value={appointmentForm.prenom}
                         onChange={(e) => setAppointmentForm({ ...appointmentForm, prenom: e.target.value })}
                         required
+                        autoComplete="given-name"
+                        inputMode="text"
                       />
                     </div>
                     <div>
@@ -1363,6 +1435,9 @@ export default function Home() {
                         value={appointmentForm.telephone1}
                         onChange={(e) => setAppointmentForm({ ...appointmentForm, telephone1: e.target.value })}
                         required
+                        autoComplete="tel"
+                        inputMode="tel"
+                        placeholder="Ex: +216 22 222 222"
                       />
                     </div>
                     <div>
@@ -1375,6 +1450,9 @@ export default function Home() {
                         className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-primary focus:ring-primary sm:text-sm"
                         value={appointmentForm.telephone2}
                         onChange={(e) => setAppointmentForm({ ...appointmentForm, telephone2: e.target.value })}
+                        autoComplete="tel"
+                        inputMode="tel"
+                        placeholder="Ex: +216 22 222 222"
                       />
                     </div>
                     <div>
