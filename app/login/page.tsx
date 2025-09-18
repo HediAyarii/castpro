@@ -104,6 +104,8 @@ export default function AdminLogin() {
   // Appointments state
   const [appointments, setAppointments] = useState<Appointment[]>([])
   const [selectedDate, setSelectedDate] = useState("")
+  const [isLoadingAppointments, setIsLoadingAppointments] = useState(false)
+  const [lastAppointmentLoad, setLastAppointmentLoad] = useState<number>(0)
 
   // Portfolio state
   const [portfolioItems, setPortfolioItems] = useState<PortfolioItem[]>([])
@@ -138,6 +140,31 @@ export default function AdminLogin() {
     }
   }, [])
 
+  // Rechargement automatique des rendez-vous toutes les 10 secondes
+  useEffect(() => {
+    if (!isLoggedIn) return
+
+    const interval = setInterval(() => {
+      loadAppointments()
+    }, 10000) // 10 secondes
+
+    return () => clearInterval(interval)
+  }, [isLoggedIn])
+
+  // Rechargement automatique quand l'utilisateur revient sur l'onglet
+  useEffect(() => {
+    if (!isLoggedIn) return
+
+    const handleFocus = () => {
+      if (activeTab === "appointments") {
+        loadAppointments()
+      }
+    }
+
+    window.addEventListener('focus', handleFocus)
+    return () => window.removeEventListener('focus', handleFocus)
+  }, [isLoggedIn, activeTab])
+
   const handleLogin = (e: React.FormEvent) => {
     e.preventDefault()
     if (password === "ADMIN2024") {
@@ -156,8 +183,8 @@ export default function AdminLogin() {
     setPassword("")
   }
 
-  const loadAllData = () => {
-    loadAppointments()
+  const loadAllData = async () => {
+    await loadAppointments()
     loadPortfolios()
     loadCastings()
     loadTestimonials()
@@ -165,10 +192,31 @@ export default function AdminLogin() {
     loadPartnerLogos()
   }
 
-  const loadAppointments = () => {
-    const stored = safeLocalStorage.getItem("appointments")
-    if (stored) {
-      setAppointments(JSON.parse(stored))
+  const loadAppointments = async (force = false) => {
+    const now = Date.now()
+    const timeSinceLastLoad = now - lastAppointmentLoad
+    
+    // Éviter les requêtes trop fréquentes (cache de 5 secondes)
+    if (!force && timeSinceLastLoad < 5000) {
+      console.log('Skipping appointment load - too recent')
+      return
+    }
+
+    try {
+      setIsLoadingAppointments(true)
+      const response = await fetch('/api/appointments')
+      if (response.ok) {
+        const appointmentsData = await response.json()
+        setAppointments(appointmentsData)
+        setLastAppointmentLoad(now)
+        console.log('Loaded appointments from database:', appointmentsData.length)
+      } else {
+        console.error('Error loading appointments:', response.statusText)
+      }
+    } catch (error) {
+      console.error('Error loading appointments:', error)
+    } finally {
+      setIsLoadingAppointments(false)
     }
   }
 
@@ -428,10 +476,28 @@ export default function AdminLogin() {
     }
   }
 
-  const updateAppointmentStatus = (id: string, status: "confirmed" | "cancelled") => {
-    const updated = appointments.map((apt) => (apt.id === id ? { ...apt, status } : apt))
-    setAppointments(updated)
-    safeLocalStorage.setItem("appointments", JSON.stringify(updated))
+  const updateAppointmentStatus = async (id: string, status: "confirmed" | "cancelled") => {
+    try {
+      const response = await fetch('/api/appointments', {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ id, status }),
+      })
+
+      if (response.ok) {
+        // Recharger les rendez-vous depuis la base de données avec cache
+        await loadAppointments(true)
+        console.log(`Appointment ${id} status updated to ${status}`)
+      } else {
+        console.error('Error updating appointment status:', response.statusText)
+        alert('Erreur lors de la mise à jour du statut')
+      }
+    } catch (error) {
+      console.error('Error updating appointment status:', error)
+      alert('Erreur lors de la mise à jour du statut')
+    }
   }
 
   const getStatusColor = (status: string) => {
@@ -640,7 +706,10 @@ export default function AdminLogin() {
         <div className="bg-white rounded-lg shadow-sm mb-6">
           <div className="flex border-b overflow-x-auto">
             <button
-              onClick={() => setActiveTab("appointments")}
+              onClick={() => {
+                setActiveTab("appointments")
+                loadAppointments(true) // Force le rechargement
+              }}
               className={`px-6 py-3 font-medium whitespace-nowrap ${activeTab === "appointments" ? "border-b-2 border-blue-500 text-blue-600" : "text-gray-500 hover:text-gray-700"}`}
             >
               <Calendar className="h-5 w-5 inline mr-2" />
@@ -764,8 +833,22 @@ export default function AdminLogin() {
             {/* Appointments List */}
             <Card>
               <CardHeader>
-                <CardTitle>Rendez-vous ({filteredAppointments.length})</CardTitle>
-                <CardDescription>Gérez et confirmez les rendez-vous après contact téléphonique</CardDescription>
+                <div className="flex justify-between items-center">
+                  <div>
+                    <CardTitle>Rendez-vous ({filteredAppointments.length})</CardTitle>
+                    <CardDescription>Gérez et confirmez les rendez-vous après contact téléphonique</CardDescription>
+                  </div>
+                  <Button 
+                    onClick={() => loadAppointments(true)}
+                    variant="outline"
+                    size="sm"
+                    className="flex items-center gap-2"
+                    disabled={isLoadingAppointments}
+                  >
+                    <Clock className={`h-4 w-4 ${isLoadingAppointments ? 'animate-spin' : ''}`} />
+                    {isLoadingAppointments ? 'Chargement...' : 'Actualiser'}
+                  </Button>
+                </div>
               </CardHeader>
               <CardContent>
                 {filteredAppointments.length === 0 ? (

@@ -171,56 +171,33 @@ export default function Home() {
   })
 
   const [isSubmittingContact, setIsSubmittingContact] = useState(false)
+  const [availableSlots, setAvailableSlots] = useState<any[]>([])
+  const [isLoadingSlots, setIsLoadingSlots] = useState(true)
 
-  const generateAvailableSlots = () => {
-    const slots = []
-    const today = new Date()
-
-    // Get existing appointments from localStorage to check for conflicts
-    const existingAppointments = JSON.parse(safeLocalStorage.getItem("appointments") || "[]")
-    const bookedSlots = new Set(
-      existingAppointments
-        .filter((apt: any) => apt.status !== "cancelled")
-        .map((apt: any) => `${apt.date}_${apt.time}`),
-    )
-
-    // Generate next 30 days
-    for (let i = 1; i <= 30; i++) {
-      const date = new Date(today)
-      date.setDate(today.getDate() + i)
-
-      // Skip Mondays (0 = Sunday, 1 = Monday)
-      if (date.getDay() === 1) continue
-
-      const dateStr = date.toISOString().split("T")[0]
-
-      // Generate time slots from 10:00 to 18:00 every 20 minutes
-      for (let hour = 10; hour < 18; hour++) {
-        for (let minute = 0; minute < 60; minute += 20) {
-          const timeStr = `${hour.toString().padStart(2, "0")}:${minute.toString().padStart(2, "0")}`
-          const slotKey = `${dateStr}_${timeStr}`
-
-          // Only add slot if it's not already booked
-          if (!bookedSlots.has(slotKey)) {
-            slots.push({
-              date: dateStr,
-              time: timeStr,
-              dateDisplay: date.toLocaleDateString("fr-FR", {
-                weekday: "long",
-                year: "numeric",
-                month: "long",
-                day: "numeric",
-              }),
-            })
-          }
+  // Charger les créneaux disponibles depuis l'API
+  useEffect(() => {
+    const fetchAvailableSlots = async () => {
+      try {
+        setIsLoadingSlots(true)
+        const response = await fetch('/api/appointments/available-slots')
+        if (response.ok) {
+          const slots = await response.json()
+          setAvailableSlots(slots)
+        } else {
+          console.error('Erreur lors du chargement des créneaux:', response.statusText)
+          setAvailableSlots([])
         }
+      } catch (error) {
+        console.error('Erreur lors du chargement des créneaux:', error)
+        setAvailableSlots([])
+      } finally {
+        setIsLoadingSlots(false)
       }
     }
 
-    return slots
-  }
+    fetchAvailableSlots()
+  }, [])
 
-  const availableSlots = generateAvailableSlots()
   const availableDates = [...new Set(availableSlots.map((slot) => slot.date))]
 
   const handleAppointmentSubmit = async (e: React.FormEvent) => {
@@ -241,26 +218,13 @@ export default function Home() {
       return
     }
 
-    // Get existing appointments from localStorage with error handling
-    let existingAppointments = []
-    try {
-      const stored = safeLocalStorage.getItem("appointments")
-      existingAppointments = stored ? JSON.parse(stored) : []
-    } catch (error) {
-      console.warn('Error reading localStorage:', error)
-      existingAppointments = []
-    }
-
-    // Check if the selected slot is already booked
-    const isSlotTaken = existingAppointments.some(
-      (apt: any) =>
-        apt.date === appointmentForm.selectedDate &&
-        apt.time === appointmentForm.selectedTime &&
-        apt.status !== "cancelled",
+    // Vérifier que le créneau sélectionné est toujours dans la liste des créneaux disponibles
+    const selectedSlot = availableSlots.find(
+      slot => slot.date === appointmentForm.selectedDate && slot.time === appointmentForm.selectedTime
     )
-
-    if (isSlotTaken) {
-      alert("Ce créneau est déjà réservé. Veuillez choisir un autre horaire.")
+    
+    if (!selectedSlot) {
+      alert("Ce créneau n'est plus disponible. Veuillez choisir un autre horaire.")
       return
     }
 
@@ -301,15 +265,6 @@ export default function Home() {
       const result = await response.json()
       console.log('Appointment saved successfully:', result)
 
-      // Add new appointment to localStorage for local display
-      try {
-        const updatedAppointments = [...existingAppointments, appointment]
-        safeLocalStorage.setItem("appointments", JSON.stringify(updatedAppointments))
-      } catch (error) {
-        console.warn('Error saving to localStorage:', error)
-        // Continue anyway, the appointment was saved to database
-      }
-
       alert("Rendez-vous demandé avec succès! Nous vous contacterons pour confirmation.")
       setIsAppointmentModalOpen(false)
       setAppointmentForm({
@@ -320,6 +275,13 @@ export default function Home() {
         selectedDate: "",
         selectedTime: "",
       })
+
+      // Recharger les créneaux disponibles après la réservation
+      const slotsResponse = await fetch('/api/appointments/available-slots')
+      if (slotsResponse.ok) {
+        const updatedSlots = await slotsResponse.json()
+        setAvailableSlots(updatedSlots)
+      }
     } catch (error) {
       console.error('Error saving appointment:', error)
       
@@ -1467,11 +1429,15 @@ export default function Home() {
                         required
                       >
                         <option value="">Sélectionner une date</option>
-                        {availableDates.map((date) => (
-                          <option key={date} value={date}>
-                            {availableSlots.find((slot) => slot.date === date)?.dateDisplay}
-                          </option>
-                        ))}
+                        {isLoadingSlots ? (
+                          <option disabled>Chargement des créneaux...</option>
+                        ) : (
+                          availableDates.map((date) => (
+                            <option key={date} value={date}>
+                              {availableSlots.find((slot) => slot.date === date)?.dateDisplay}
+                            </option>
+                          ))
+                        )}
                       </select>
                     </div>
                     <div>
@@ -1486,13 +1452,17 @@ export default function Home() {
                         required
                       >
                         <option value="">Sélectionner une heure</option>
-                        {availableSlots
-                          .filter((slot) => slot.date === appointmentForm.selectedDate)
-                          .map((slot) => (
-                            <option key={slot.date + slot.time} value={slot.time}>
-                              {slot.time}
-                            </option>
-                          ))}
+                        {isLoadingSlots ? (
+                          <option disabled>Chargement des créneaux...</option>
+                        ) : (
+                          availableSlots
+                            .filter((slot) => slot.date === appointmentForm.selectedDate)
+                            .map((slot) => (
+                              <option key={slot.date + slot.time} value={slot.time}>
+                                {slot.time}
+                              </option>
+                            ))
+                        )}
                       </select>
                     </div>
                   </div>

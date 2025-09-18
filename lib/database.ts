@@ -232,6 +232,7 @@ export async function getAppointments() {
   try {
     const appointments = await sql`
       SELECT * FROM appointments 
+      WHERE created_at >= NOW() - INTERVAL '7 days'
       ORDER BY created_at DESC
     `
     return appointments
@@ -268,6 +269,81 @@ export async function updateAppointmentStatus(id: number, status: string) {
   } catch (error) {
     console.error("Error updating appointment status:", error)
     throw error
+  }
+}
+
+export async function getAvailableAppointmentSlots() {
+  try {
+    // Récupérer tous les rendez-vous non annulés
+    const bookedAppointments = await sql`
+      SELECT date, time FROM appointments 
+      WHERE status != 'cancelled'
+    `
+    
+    console.log(`Found ${bookedAppointments.length} booked appointments`)
+    
+    // Créer un ensemble des créneaux déjà réservés
+    const bookedSlots = new Set(
+      bookedAppointments.map((apt: any) => `${apt.date}_${apt.time}`)
+    )
+    
+    // Générer tous les créneaux possibles
+    const slots = []
+    const today = new Date()
+    
+    // Générer les 30 prochains jours
+    for (let i = 1; i <= 30; i++) {
+      const date = new Date(today)
+      date.setDate(today.getDate() + i)
+      
+      // Exclure les lundis (jour 1)
+      if (date.getDay() === 1) continue
+      
+      const dateStr = date.toISOString().split("T")[0]
+      
+      // Générer les créneaux de 10h00 à 18h00 toutes les 20 minutes
+      for (let hour = 10; hour < 18; hour++) {
+        for (let minute = 0; minute < 60; minute += 20) {
+          const timeStr = `${hour.toString().padStart(2, "0")}:${minute.toString().padStart(2, "0")}`
+          const slotKey = `${dateStr}_${timeStr}`
+          
+          // Ajouter seulement les créneaux non réservés
+          if (!bookedSlots.has(slotKey)) {
+            slots.push({
+              date: dateStr,
+              time: timeStr,
+              dateDisplay: date.toLocaleDateString("fr-FR", {
+                weekday: "long",
+                year: "numeric",
+                month: "long",
+                day: "numeric",
+              }),
+            })
+          }
+        }
+      }
+    }
+    
+    console.log(`Generated ${slots.length} available slots`)
+    return slots
+  } catch (error) {
+    console.error("Error fetching available appointment slots:", error)
+    return []
+  }
+}
+
+export async function checkAppointmentAvailability(date: string, time: string) {
+  try {
+    const result = await sql`
+      SELECT COUNT(*) as count FROM appointments 
+      WHERE date = ${date} AND time = ${time} AND status != 'cancelled'
+    `
+    console.log(`Checking availability for ${date} ${time}: ${result[0].count} appointments found`)
+    return parseInt(result[0].count) === 0
+  } catch (error) {
+    console.error("Error checking appointment availability:", error)
+    // En cas d'erreur, on considère le créneau comme disponible pour éviter de bloquer l'utilisateur
+    return true
   }
 }
 
