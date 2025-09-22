@@ -523,7 +523,12 @@ export default function AdminLogin() {
     }
   }
 
-  const filteredAppointments = selectedDate ? appointments.filter((apt) => apt.date === selectedDate) : appointments
+  const filteredAppointments = selectedDate ? appointments.filter((apt) => {
+    // Normaliser les dates pour la comparaison
+    const aptDate = new Date(apt.date).toISOString().split('T')[0]
+    console.log(`Comparing: ${aptDate} === ${selectedDate}`, aptDate === selectedDate)
+    return aptDate === selectedDate
+  }) : appointments
 
   const loadAccessKeys = async () => {
     try {
