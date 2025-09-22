@@ -43,6 +43,7 @@ interface Appointment {
   time: string
   status: "pending" | "confirmed" | "cancelled"
   createdAt: string
+  photo_url?: string
 }
 
 interface PortfolioItem {
@@ -877,6 +878,21 @@ export default function AdminLogin() {
                                 {getStatusText(appointment.status)}
                               </Badge>
                             </div>
+
+                            {/* Photo du candidat */}
+                            {appointment.photo_url && (
+                              <div className="mb-3">
+                                <img
+                                  src={appointment.photo_url}
+                                  alt={`Photo de ${appointment.prenom} ${appointment.nom}`}
+                                  className="w-16 h-16 object-cover rounded-lg border"
+                                  onError={(e) => {
+                                    const img = e.target as HTMLImageElement
+                                    img.style.display = 'none'
+                                  }}
+                                />
+                              </div>
+                            )}
 
                             <div className="grid md:grid-cols-2 gap-4 text-sm text-gray-600">
                               <div className="flex items-center gap-2">

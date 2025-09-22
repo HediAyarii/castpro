@@ -245,9 +245,9 @@ export async function getAppointments() {
 export async function createAppointment(data: any) {
   try {
     const result = await sql`
-      INSERT INTO appointments (id, nom, prenom, telephone1, telephone2, date, time, status)
+      INSERT INTO appointments (id, nom, prenom, telephone1, telephone2, date, time, status, photo_url)
       VALUES (${data.id}, ${data.nom}, ${data.prenom}, ${data.telephone1}, ${data.telephone2}, 
-              ${data.date}, ${data.time}, ${data.status || "pending"})
+              ${data.date}, ${data.time}, ${data.status || "pending"}, ${data.photo_url || null})
       RETURNING *
     `
     return result[0]

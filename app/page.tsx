@@ -162,6 +162,7 @@ export default function Home() {
     telephone2: "",
     selectedDate: "",
     selectedTime: "",
+    photo: null as File | null,
   })
 
   const [contactForm, setContactForm] = useState({
@@ -241,6 +242,33 @@ export default function Home() {
     }
 
     try {
+      let photoUrl = null
+      
+      // Upload photo if provided
+      if (appointmentForm.photo) {
+        const photoFormData = new FormData()
+        photoFormData.append('photo', appointmentForm.photo)
+        photoFormData.append('appointmentId', appointment.id)
+        
+        const photoResponse = await fetch('/api/upload-candidate-photo', {
+          method: 'POST',
+          body: photoFormData,
+        })
+        
+        if (photoResponse.ok) {
+          const photoResult = await photoResponse.json()
+          photoUrl = photoResult.photoUrl
+          console.log('Photo uploaded successfully:', photoResult)
+        } else {
+          console.warn('Photo upload failed, continuing without photo')
+        }
+      }
+
+      const appointmentData = {
+        ...appointment,
+        photo_url: photoUrl,
+      }
+
       // Save to database via API with timeout and retry logic
       const controller = new AbortController()
       const timeoutId = setTimeout(() => controller.abort(), 10000) // 10 second timeout
@@ -250,7 +278,7 @@ export default function Home() {
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify(appointment),
+        body: JSON.stringify(appointmentData),
         signal: controller.signal,
       })
 
@@ -274,6 +302,7 @@ export default function Home() {
         telephone2: "",
         selectedDate: "",
         selectedTime: "",
+        photo: null,
       })
 
       // Recharger les créneaux disponibles après la réservation
@@ -1368,6 +1397,30 @@ export default function Home() {
                         inputMode="tel"
                         placeholder="Ex: +216 22 222 222"
                       />
+                    </div>
+                    <div>
+                      <label htmlFor="photo" className="block text-sm font-medium text-gray-700">
+                        Photo de profil (Optionnel)
+                      </label>
+                      <input
+                        type="file"
+                        id="photo"
+                        accept="image/*"
+                        className="mt-1 block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-primary file:text-white hover:file:bg-primary/90"
+                        onChange={(e) => {
+                          const file = e.target.files?.[0] || null
+                          setAppointmentForm({ ...appointmentForm, photo: file })
+                        }}
+                      />
+                      {appointmentForm.photo && (
+                        <div className="mt-2">
+                          <img
+                            src={URL.createObjectURL(appointmentForm.photo)}
+                            alt="Aperçu"
+                            className="w-20 h-20 object-cover rounded-lg border"
+                          />
+                        </div>
+                      )}
                     </div>
                     <div>
                       <label htmlFor="selectedDate" className="block text-sm font-medium text-gray-700">
