@@ -193,7 +193,7 @@ export function BulkUploadOptimized({ onBulkUpload, isOpen, onClose, activeTab =
                 Sélectionner des images
               </Button>
               <p className="text-sm text-gray-500">
-                Maximum 10 fichiers, 5MB par fichier (optimisé pour vitesse)
+                Maximum 10 fichiers, 30MB par fichier (compressé automatiquement à 5MB max)
               </p>
             </div>
           </div>
@@ -298,7 +298,8 @@ export function BulkUploadOptimized({ onBulkUpload, isOpen, onClose, activeTab =
               <li>• <strong>Compression automatique</strong> : Réduction de la taille des images</li>
               <li>• <strong>Redimensionnement intelligent</strong> : Adaptation automatique des dimensions</li>
               <li>• <strong>Timeouts configurés</strong> : Évite les blocages</li>
-              <li>• <strong>Limite de fichiers</strong> : Maximum 10 fichiers par batch (optimisé)</li>
+              <li>• <strong>Compression automatique</strong> : Réduction à 5MB maximum</li>
+              <li>• <strong>Limite de fichiers</strong> : Maximum 10 fichiers par batch</li>
             </ul>
           </div>
         </CardContent>
