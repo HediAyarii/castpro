@@ -4,11 +4,12 @@ import { join } from 'path'
 import { existsSync } from 'fs'
 import sharp from 'sharp'
 
-// Configuration pour l'upload de photos de candidats
+// Configuration pour l'upload de photos de candidats - COMPRESSION ULTRA-AGRESSIVE
 const MAX_FILE_SIZE = 10 * 1024 * 1024 // 10MB max
-const COMPRESSION_QUALITY = 80 // Qualité pour les photos de candidats
-const MAX_WIDTH = 800 // Taille réduite pour les photos de profil
-const MAX_HEIGHT = 800
+const COMPRESSION_QUALITY = 60 // Compression très agressive pour réduire la taille
+const MAX_WIDTH = 400 // Taille très réduite pour économiser l'espace
+const MAX_HEIGHT = 400
+const TARGET_SIZE = 100 * 1024 // 100KB maximum après compression
 
 export async function POST(request: NextRequest) {
   try {
@@ -49,16 +50,45 @@ export async function POST(request: NextRequest) {
     const bytes = await file.arrayBuffer()
     const buffer = Buffer.from(bytes)
     
-    // Compression et redimensionnement
+    // Compression ultra-agressive pour réduire la taille
     let optimizedBuffer: Buffer
     try {
-      optimizedBuffer = await sharp(buffer)
-        .resize(MAX_WIDTH, MAX_HEIGHT, {
-          fit: 'inside',
-          withoutEnlargement: true
-        })
-        .jpeg({ quality: COMPRESSION_QUALITY })
-        .toBuffer()
+      const image = sharp(buffer)
+      const metadata = await image.metadata()
+      
+      // Corriger automatiquement la rotation selon les métadonnées EXIF
+      image.rotate()
+      
+      // Compression progressive jusqu'à atteindre 100KB max
+      let quality = COMPRESSION_QUALITY
+      let targetSize = TARGET_SIZE
+      
+      // Redimensionner d'abord si très gros
+      if (metadata.width && metadata.height) {
+        if (metadata.width > MAX_WIDTH || metadata.height > MAX_HEIGHT) {
+          image.resize(MAX_WIDTH, MAX_HEIGHT, {
+            fit: 'inside',
+            withoutEnlargement: true
+          })
+        }
+      }
+
+      // Compression progressive jusqu'à 100KB
+      do {
+        const jpegBuffer = await image.jpeg({ quality: quality }).toBuffer()
+        optimizedBuffer = Buffer.from(jpegBuffer)
+        
+        // Si encore trop gros, réduire la qualité
+        if (optimizedBuffer.length > targetSize && quality > 20) {
+          quality -= 10
+          console.log(`Compression ${file.name}: qualité ${quality}%, taille ${Math.round(optimizedBuffer.length / 1024)}KB`)
+        } else {
+          break
+        }
+      } while (optimizedBuffer.length > targetSize && quality > 20)
+      
+      console.log(`Photo candidat ${file.name}: ${Math.round(file.size / 1024)}KB → ${Math.round(optimizedBuffer.length / 1024)}KB (qualité ${quality}%)`)
+      
     } catch (sharpError) {
       console.warn(`Erreur Sharp pour ${file.name}, utilisation du fichier original:`, sharpError)
       optimizedBuffer = buffer
@@ -67,16 +97,19 @@ export async function POST(request: NextRequest) {
     // Écrire le fichier
     await writeFile(filePath, optimizedBuffer)
     
-    // Retourner l'URL de la photo
+    // Retourner l'URL de la photo ET l'image compressée en base64
     const photoUrl = `/api/serve-image/candidates/${fileName}`
+    const photoBase64 = optimizedBuffer.toString('base64')
     
-    console.log(`Photo candidat uploadée: ${fileName}`)
+    console.log(`Photo candidat uploadée: ${fileName} (${Math.round(optimizedBuffer.length / 1024)}KB)`)
     
     return NextResponse.json({
       success: true,
       photoUrl: photoUrl,
+      photoCompressed: photoBase64,
       fileName: fileName,
-      size: optimizedBuffer.length
+      size: optimizedBuffer.length,
+      compressionRatio: Math.round((1 - optimizedBuffer.length / file.size) * 100)
     })
     
   } catch (error) {

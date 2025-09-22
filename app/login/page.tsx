@@ -44,6 +44,7 @@ interface Appointment {
   status: "pending" | "confirmed" | "cancelled"
   createdAt: string
   photo_url?: string
+  photo_compressed?: string
 }
 
 interface PortfolioItem {
@@ -880,10 +881,10 @@ export default function AdminLogin() {
                             </div>
 
                             {/* Photo du candidat */}
-                            {appointment.photo_url && (
+                            {(appointment.photo_url || appointment.photo_compressed) && (
                               <div className="mb-3">
                                 <img
-                                  src={appointment.photo_url}
+                                  src={appointment.photo_compressed ? `data:image/jpeg;base64,${appointment.photo_compressed}` : appointment.photo_url}
                                   alt={`Photo de ${appointment.prenom} ${appointment.nom}`}
                                   className="w-16 h-16 object-cover rounded-lg border"
                                   onError={(e) => {

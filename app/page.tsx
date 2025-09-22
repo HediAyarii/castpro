@@ -207,8 +207,8 @@ export default function Home() {
     // Validate form data
     if (!appointmentForm.nom.trim() || !appointmentForm.prenom.trim() || 
         !appointmentForm.telephone1.trim() || !appointmentForm.selectedDate || 
-        !appointmentForm.selectedTime) {
-      alert("Veuillez remplir tous les champs obligatoires.")
+        !appointmentForm.selectedTime || !appointmentForm.photo) {
+      alert("Veuillez remplir tous les champs obligatoires, y compris la photo de profil.")
       return
     }
 
@@ -243,6 +243,7 @@ export default function Home() {
 
     try {
       let photoUrl = null
+      let photoCompressed = null
       
       // Upload photo if provided
       if (appointmentForm.photo) {
@@ -258,6 +259,7 @@ export default function Home() {
         if (photoResponse.ok) {
           const photoResult = await photoResponse.json()
           photoUrl = photoResult.photoUrl
+          photoCompressed = photoResult.photoCompressed
           console.log('Photo uploaded successfully:', photoResult)
         } else {
           console.warn('Photo upload failed, continuing without photo')
@@ -267,6 +269,7 @@ export default function Home() {
       const appointmentData = {
         ...appointment,
         photo_url: photoUrl,
+        photo_compressed: photoCompressed,
       }
 
       // Save to database via API with timeout and retry logic
@@ -1400,7 +1403,7 @@ export default function Home() {
                     </div>
                     <div>
                       <label htmlFor="photo" className="block text-sm font-medium text-gray-700">
-                        Photo de profil (Optionnel)
+                        Photo de profil <span className="text-red-500">*</span>
                       </label>
                       <input
                         type="file"
@@ -1411,6 +1414,7 @@ export default function Home() {
                           const file = e.target.files?.[0] || null
                           setAppointmentForm({ ...appointmentForm, photo: file })
                         }}
+                        required
                       />
                       {appointmentForm.photo && (
                         <div className="mt-2">
@@ -1419,8 +1423,14 @@ export default function Home() {
                             alt="Aperçu"
                             className="w-20 h-20 object-cover rounded-lg border"
                           />
+                          <p className="text-xs text-gray-500 mt-1">
+                            Taille: {Math.round(appointmentForm.photo.size / 1024)} KB
+                          </p>
                         </div>
                       )}
+                      <p className="text-xs text-gray-500 mt-1">
+                        Formats acceptés: JPG, PNG. Taille maximale: 10MB. L'image sera automatiquement compressée.
+                      </p>
                     </div>
                     <div>
                       <label htmlFor="selectedDate" className="block text-sm font-medium text-gray-700">
