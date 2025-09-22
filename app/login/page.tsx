@@ -8,6 +8,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Badge } from "@/components/ui/badge"
 import { ImageUpload } from "@/components/ui/image-upload"
 import { BulkUpload } from "@/components/ui/bulk-upload"
+import { BulkUploadOptimized } from "@/components/ui/bulk-upload-optimized"
 import { BulkLogoUpload } from "@/components/ui/bulk-logo-upload"
 import { safeLocalStorage } from "@/lib/storage"
 import {
@@ -1118,8 +1119,8 @@ export default function AdminLogin() {
               </div>
             </div>
 
-            {/* Bulk Upload Modal */}
-            <BulkUpload
+            {/* Bulk Upload Modal - Version Optimisée */}
+            <BulkUploadOptimized
               isOpen={isBulkUploadOpen}
               onClose={() => setIsBulkUploadOpen(false)}
               onBulkUpload={handleBulkUpload}

@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server'
 import { writeFile, mkdir } from 'fs/promises'
 import { join } from 'path'
 import { existsSync } from 'fs'
+import sharp from 'sharp'
 
 export async function POST(request: NextRequest) {
   try {
@@ -46,10 +47,34 @@ export async function POST(request: NextRequest) {
     // Chemin complet du fichier
     const filePath = join(uploadsDir, fileName)
 
-    // Convertir le fichier en buffer et l'écrire
+    // Convertir le fichier en buffer
     const bytes = await file.arrayBuffer()
     const buffer = Buffer.from(bytes)
-    await writeFile(filePath, buffer)
+
+    // Optimiser l'image avec Sharp (correction de rotation + compression)
+    let optimizedBuffer: Buffer = buffer
+    try {
+      const image = sharp(buffer)
+      
+      // Corriger automatiquement la rotation selon les métadonnées EXIF
+      image.rotate()
+      
+      // Optimiser selon le format
+      if (fileExtension === 'png') {
+        const pngBuffer = await image.png({ quality: 85 }).toBuffer()
+        optimizedBuffer = Buffer.from(pngBuffer)
+      } else {
+        const jpegBuffer = await image.jpeg({ quality: 85 }).toBuffer()
+        optimizedBuffer = Buffer.from(jpegBuffer)
+      }
+    } catch (sharpError) {
+      console.warn(`Erreur Sharp pour ${file.name}, utilisation du fichier original:`, sharpError)
+      // En cas d'erreur Sharp, utiliser le fichier original
+      optimizedBuffer = buffer
+    }
+
+    // Écrire le fichier optimisé
+    await writeFile(filePath, optimizedBuffer)
 
     // Retourner l'URL de l'API de service d'images
     const fileUrl = `/api/serve-image/${fileName}`

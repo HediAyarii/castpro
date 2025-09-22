@@ -93,6 +93,15 @@ CREATE TABLE IF NOT EXISTS partner_logos (
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
+-- Collaboration videos table
+CREATE TABLE IF NOT EXISTS collaboration_videos (
+    id SERIAL PRIMARY KEY,
+    title VARCHAR(200) NOT NULL,
+    description TEXT,
+    video_url TEXT NOT NULL,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
 -- Insert admin user with password ADMIN2024 (bcrypt hash)
 INSERT INTO users (username, password_hash, role) 
 VALUES ('admin', '$2b$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', 'admin')
@@ -107,3 +116,4 @@ CREATE INDEX IF NOT EXISTS idx_castings_status ON castings(status);
 CREATE INDEX IF NOT EXISTS idx_castings_date ON castings(date);
 CREATE INDEX IF NOT EXISTS idx_access_keys_active ON access_keys(is_active);
 CREATE INDEX IF NOT EXISTS idx_media_type ON media_items(type);
+CREATE INDEX IF NOT EXISTS idx_collaboration_videos_created ON collaboration_videos(created_at);

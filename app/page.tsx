@@ -1006,54 +1006,6 @@ export default function Home() {
         </div>
       </section>
 
-      <section className="py-20 bg-black border-t border-gray-800">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center mb-16">
-            <h2 className="text-4xl font-bold font-space-grotesk mb-4 text-white">Ce que disent nos clients</h2>
-            <p className="text-xl text-gray-300">Leurs témoignages parlent pour nous</p>
-          </div>
-          {testimonials.length > 0 ? (
-          <div className="grid md:grid-cols-3 gap-8">
-              {testimonials.map((t: any) => (
-              <Card
-                  key={t.id}
-                className="relative hover:shadow-lg transition-shadow bg-gray-900 border-gray-700 hover:border-primary/50"
-              >
-                <CardHeader>
-                  <div className="flex items-center gap-1 mb-2">
-                      {[...Array(Math.max(0, Math.min(5, Number(t.rating) || 0)))].map((_, i) => (
-                      <Star key={i} className="w-4 h-4 fill-yellow-400 text-yellow-400" />
-                    ))}
-                  </div>
-                  <Quote className="w-8 h-8 text-primary/30 absolute top-4 right-4" />
-                </CardHeader>
-                <CardContent>
-                    <div className="flex gap-4 mb-4 items-center">
-                      <img
-                        src={(t.image || '').trim() !== '' ? t.image : '/placeholder-user.jpg'}
-                        alt={t.name}
-                        className="w-12 h-12 rounded-full object-cover"
-                        onError={(e) => {
-                          const img = e.target as HTMLImageElement
-                          img.src = '/placeholder-user.jpg'
-                        }}
-                      />
-                  <div>
-                        <div className="font-semibold text-white">{t.name}</div>
-                        <div className="text-sm text-gray-400">{t.role}</div>
-                  </div>
-                    </div>
-                    <p className="text-gray-300 italic">"{t.content}"</p>
-                </CardContent>
-              </Card>
-            ))}
-          </div>
-          ) : (
-            <div className="text-center text-gray-300">Aucun témoignage pour le moment.</div>
-          )}
-        </div>
-      </section>
-
       {/* Dynamic Partners Section (category: partner) */}
       <section className="py-20 bg-black border-t border-gray-800">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
