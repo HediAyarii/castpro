@@ -1429,7 +1429,7 @@ export default function Home() {
                         </div>
                       )}
                       <p className="text-xs text-gray-500 mt-1">
-                        Formats acceptés: JPG, PNG. Taille maximale: 10MB. L'image sera automatiquement compressée.
+                        Formats acceptés: JPG, PNG. Taille maximale: 10MB. L'image sera automatiquement compressée à 50KB max.
                       </p>
                     </div>
                     <div>

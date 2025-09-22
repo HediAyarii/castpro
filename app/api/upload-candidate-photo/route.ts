@@ -6,10 +6,10 @@ import sharp from 'sharp'
 
 // Configuration pour l'upload de photos de candidats - COMPRESSION ULTRA-AGRESSIVE
 const MAX_FILE_SIZE = 10 * 1024 * 1024 // 10MB max
-const COMPRESSION_QUALITY = 60 // Compression très agressive pour réduire la taille
-const MAX_WIDTH = 400 // Taille très réduite pour économiser l'espace
-const MAX_HEIGHT = 400
-const TARGET_SIZE = 100 * 1024 // 100KB maximum après compression
+const COMPRESSION_QUALITY = 50 // Compression encore plus agressive
+const MAX_WIDTH = 300 // Taille encore plus réduite
+const MAX_HEIGHT = 300
+const TARGET_SIZE = 50 * 1024 // 50KB maximum après compression
 
 export async function POST(request: NextRequest) {
   try {
@@ -59,7 +59,7 @@ export async function POST(request: NextRequest) {
       // Corriger automatiquement la rotation selon les métadonnées EXIF
       image.rotate()
       
-      // Compression progressive jusqu'à atteindre 100KB max
+      // Compression progressive jusqu'à atteindre 50KB max
       let quality = COMPRESSION_QUALITY
       let targetSize = TARGET_SIZE
       
@@ -73,19 +73,19 @@ export async function POST(request: NextRequest) {
         }
       }
 
-      // Compression progressive jusqu'à 100KB
+      // Compression progressive jusqu'à 50KB
       do {
         const jpegBuffer = await image.jpeg({ quality: quality }).toBuffer()
         optimizedBuffer = Buffer.from(jpegBuffer)
         
         // Si encore trop gros, réduire la qualité
-        if (optimizedBuffer.length > targetSize && quality > 20) {
-          quality -= 10
+        if (optimizedBuffer.length > targetSize && quality > 15) {
+          quality -= 5
           console.log(`Compression ${file.name}: qualité ${quality}%, taille ${Math.round(optimizedBuffer.length / 1024)}KB`)
         } else {
           break
         }
-      } while (optimizedBuffer.length > targetSize && quality > 20)
+      } while (optimizedBuffer.length > targetSize && quality > 15)
       
       console.log(`Photo candidat ${file.name}: ${Math.round(file.size / 1024)}KB → ${Math.round(optimizedBuffer.length / 1024)}KB (qualité ${quality}%)`)
       
