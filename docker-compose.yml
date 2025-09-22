@@ -11,12 +11,16 @@ services:
       - DATABASE_URL=postgresql://postgres:postgres@postgres:5432/castpro
       - JWT_SECRET=your-super-secret-jwt-key-change-this-in-production
       - UPLOAD_SECRET=your-upload-secret-key-change-this-in-production
+      - MAX_FILE_SIZE=5242880  # 5MB
+      - UPLOAD_TIMEOUT=60000   # 60s
+      - COMPRESSION_QUALITY=75
+      - MAX_FILES_PER_BATCH=10
     depends_on:
       postgres:
         condition: service_healthy
     volumes:
       - ./public:/app/public
-      - ./uploads:/app/uploads
+      - ./public/uploads:/app/public/uploads
     restart: unless-stopped
     networks:
       - castpro-network
